@@ -1,0 +1,617 @@
+---
+title: RabbitMQ Plugin
+owner: Erlang Solutions
+---
+
+##<a id='description'></a>Description
+
+The `rabbitmq` plugin exposes metrics describing the channels, the queues,
+the messages, the connections, the consumers, the exchanges and the activities
+related to the users on the monitored RabbitMQ node. There are four main groups.
+
+- Overview metrics denotes the total number of objects that are currently
+  active + the total number objects that were created the since the last time,
+  the metric was read + total number of active objects from the other RabbitMQ
+  nodes in a cluster. By objects, we mean the AMQP connections, channels,
+  consumers, queues and exchanges.
+- Simple metrics that are cumulative metrics. They will be continuously
+  increasing i.e. cumulative. If the plugin is restarted, all the metric values
+  will be reset.
+- Message rate metrics denotes the total number of messages handled by the
+  RabbitMQ node per second. Some of the message types are publish, confirm,
+  redeliver etc.
+- Statistic metrics that characterise the current status of the RabbitMQ node
+  from different point of views. The values are total sums derived by counting
+  all instances of a certain Rabbit object, for instance, the 'Queue messages'
+  metric shows the total count of messages in all queues. These metrics are
+  cumulative.
+
+##<a id='supported_versions'></a>Supported versions.
+
+Official stable Rabbit releases newer than 2.3.0 are supported.
+
+##<a id='applications_it_depends_on'></a>Applications it depends on
+
+`rabbit`
+
+##<a id='modules'></a>Modules
+
+- `wombat_plugin_rabbitmq`
+- `wombat_plugin_rabbitmq_handler`
+- `wombat_plugin_rabbitmq_metrics`
+
+##<a id='configuration_options'></a>Configuration options
+
+* `priority`: the priority of the RabbitMQ process. The following values can be
+  used: `low`, `normal`, `high`, `max`. Default value: `low`.
+
+* `msgq_check_period`: The plugin implements an overload protection against
+  dealing with too many notifications arriving from the `rabbit_event` handler.
+  This parameter specifies how frequently these overload conditions should be
+  checked. Measured in milliseconds. Default value: 5000.
+
+* `msgq_normal`: If the message queue length of the plugin process goes down
+  below this level, all rabbit events will be enabled. Default value: 500.
+
+* `msgq_stats`: If the message queue length of the plugin process reaches this
+  limit, statistics events will be disabled. Default value: 2000
+
+* `msgq_threshold`: When message queue length reaches this level all kinds of
+  rabbit events will be disabled. Default value: 5000.
+
+* `check_overload_after`: Overload conditions are checked also after having
+  these many messages. Default value: 2000.
+
+* `handle_not_existing_stats`: Denotes whether the plugin should handle the
+  statistics events for those RabbitMQ objects that were created before WombatOAM
+  started monitoring the node. Default value: true.
+
+* `live_metrics_read_deadline`: Deadline (in milliseconds) before which the
+  live value for any given metric should have been read. Failure to meet this
+  deadline, will lead to the deletion of the corresponding count only for the
+  closed channels. Default value: 30000.
+
+* `rabbitmq_statistics`: Denotes whether the plugin should handle the statistics
+  events. Default value: true.
+
+* `rabbit_event_mod`: The RabbitMQ module that generates the events.
+
+* `clean_stats_period`: The plugin implements a clean-up mechanism where the
+  metric values of dead objects are removed. This parameter specifies on how
+  frequently this clean-up mechanism should be trigerred. Measured in
+  milliseconds. Default value: 5000.
+
+* `clean_stats_after`: Statistics metrics values that are older than this time
+  will be removed. Measured in milliseconds. Default value: 30000.
+
+Overload protection related options
+
+The plugin implements an overload protection mechanism which ensures the plugin
+won't add a huge amount of extra work, and it will be turned automatically
+on/off when needed.
+
+The following relations must be true:
+`msgq_normal < msgq_threshold`
+
+* `msgq_normal`: If the message queue length of the plugin goes down
+   below that level all rabbit events will be enabled. Default value: 500.
+
+* `msgq_threshold`: When message queue length reaches this level all kind of
+   rabbit events will be disabled. Default value: 5000.
+
+### Example wombat.config entry
+
+```erlang
+%% Set the process priority to normal
+{set, wo_plugins, plugins, rabbitmq, priority, normal}.
+
+%% Set how frequently the overload conditions are checked to one minute
+{set, wo_plugins, plugins, rabbitmq, msgq_check_period, 60000}.
+
+%% Change below which level all events will be enabled
+{set, wo_plugins, plugins, rabbitmq, msgq_normal, 1000}.
+
+%% Above this level all kind of rabbit events are disabled
+{set, wo_plugins, plugins, rabbitmq, msgq_threshold, 7000}.
+
+%% After these many messages overload conditions are checked
+{set, wo_plugins, plugins, rabbitmq, check_overload_after, 5000}.
+
+%% Process priority of the rabbit plugin
+{set, wo_plugins, plugins, rabbitmq, priority, normal}.
+```
+
+##<a id='metrics_reported'></a>Metrics reported
+
+If the plugin is restarted, all these metrics are reset.
+
+### Overview metrics:
+
+* Total active connections:
+  Tags: `dev`
+
+  The total number of open TCP connections from producers and consumers
+  connecting to the monitored RabbitMQ node + the total number of TCP
+  connections that the monitored RabbitMQ node had opened from producers and
+  consumers, since the last time this metric was read by the WombatOAM server.
+
+  In a clustered environment, the total number TCP connections from consumers
+  connected to any of the other RabbitMQ nodes in the cluster, are also included
+  in the above total.
+
+* Total active channels:
+  Tags: `dev`
+
+  The total number of open AMQP channels from producers and consumers connecting
+  to the monitored RabbitMQ node + the total number of AMQP channels that the
+  monitored RabbitMQ node had opened from producers and consumers, since the
+  last time this metric was read by the WombatOAM server.
+
+  In a clustered environment, the total number of AMQP channels from consumers
+  connected to any of the other RabbitMQ nodes in the cluster, are also included
+  in the above total.
+
+* Total active consumers:
+  Tags: `dev`
+
+  The total number of consumers that are currently subscribed to queues on the
+  RabbitMQ node + the total number of consumers who had subscribed to the
+  RabbitMQ node since the last time the metric was read by the WombatOAM server.
+
+  In a clustered environment, the total number of consumers that are subscribed
+  with the other RabbitMQ nodes in the cluster, are also included in the above
+  total.
+
+* Total active exchanges:
+  Tags: `dev`
+
+  The total number of exchanges that have been declared and currently active
+  in the RabbitMQ node + the total number of exchanges that were declared in
+  the RabbitMQ node since the last time the metric was read by the WombatOAM
+  server + the default number of exchanges that exists in RabbitMQ (As of
+  RabbitMQ version 3.6.2 there are 8 default exchanges).
+
+  In a clustered environment, the total number of exchanges that have been
+  declared by the consumers connected to the other RabbitMQ nodes in the
+  cluster, are also included in the above total.
+
+* Total active queues:
+  Tags: `dev`
+
+  The total number of both durable and non-durable queues that currently exist
+  in the RabbitMQ node + the total number of both durable and non-durable
+  queues that were declared in the RabbitMQ node since the last time the metric
+  was read by the WombatOAM server.
+
+  In a clustered environment, the total number of both durable and non-durable
+  queues created by the other RabbitMQ nodes in the cluster, are also included
+  in the above total.
+
+### Simple metrics:
+
+Note that the RabbitMQ's management plugin does not expose most of these
+metrics.
+
+* Channels created:
+  Total number of created channels.
+  Tags: `dev`
+
+* Channels closed:
+  Total number of closed channels.
+  Tags: `dev`
+
+* Connections created:
+  Total number of created connections.
+  Tags: `dev`
+
+* Connections closed:
+  Total number of closed connections.
+  Tags: `dev`
+
+* Consumers created:
+  Total number of created consumers.
+  Tags: `dev`
+
+* Consumers deleted:
+  Total number of deleted consumers.
+  Tags: `dev`
+
+* Permission created:
+  Total number of permissions created.
+  Tags: `dev`
+
+* Permission deleted:
+  Total number of permissions deleted.
+  Tags: `dev`
+
+* Queue created:
+  Total number of created queues.
+  Tags: `dev`
+
+* Queue deleted:
+  Total number of deleted queues.
+  Tags: `dev`
+
+* User created:
+  Total number of created users.
+  Tags: `dev`, `op`
+
+* User deleted:
+  Total number of deleted users.
+  Tags: `dev`, `op`
+
+* User password changed:
+  Total number of user password changes.
+  Tags: `dev`, `op`
+
+* User password cleared:
+  Total number of user passwords being cleared.
+  Tags: `dev`, `op`
+
+* User authentication failure:
+  Total number of user authentication failures.
+  Tags: `dev`, `op`
+
+* User authentication success:
+  Total number of user authentication successes.
+  Tags: `dev`, `op`
+
+* Exchanges created:
+  Total number of exchanges created.
+  Tags: `dev`, `op`
+
+### Message rate metrics:
+
+* Publish rate:
+  Tags: `dev`
+  The number of published messages handled by the RabbitMQ server per second.
+
+* Deliver No Ack rate:
+  The number of messages delivered to all the consumers (but not yet
+  acknowledged) by the RabbitMQ server per second.
+
+* Deliver rate:
+  Tags: `dev`
+  The number of messages delivered to all the consumers (with acknowledgments)
+  by the RabbitMQ server per second.
+
+* Get No Ack rate:
+  Tags: `dev`
+  The number of messages retrieved by the consumers (using the basic.get call
+  and not yet acknowledged) by the RabbitMQ server per second.
+
+* Get rate:
+  Tags: `dev`
+  The number of messages retrieved by the consumers (using the basic.get call
+  with acknowledgements) by the RabbitMQ server per second.
+
+* Deliver Gets rate:
+  Tags: `dev`
+  The number of Get + Get no ack + Deliver + Deliver no ack messages delivered
+  to the consumers by the RabbitMQ server per second.
+
+* Ack rate:
+  Tags: `dev`
+  The number of consumer acknowledgements handled by the RabbitMQ server per
+  second.
+
+* Return Unroutable rate:
+  Tags: `dev`
+  The number of published messages that could not be routed to any queue,
+  handled by the RabbitMQ server per second.
+
+* Confirm rate:
+  Tags: `dev`
+  The number of confirmations sent to the publishers (who are in confirm mode)
+  by the RabbitMQ server per second.
+
+* Redeliver rate:
+  Tags: `dev`
+  The number of messages re-delivered to consumers (e.g. when the intended
+  consumer crashes before sending back an acknowledgement or through invoking
+  basic.recover) by the RabbitMQ server per second.
+
+### Statistic metrics:
+
+* Channel consumer count:
+  Total number of consumers that have subscribed to the broker to consume
+  messages. Same as "Consumers created".
+  Tags: `dev`
+
+* Channel messages unacknowledged:
+  Total number of unacknowledged messages.
+  Tags: `dev`
+
+* Channel messages unconfirmed:
+  Total number of messages unconfirmed by the broker.
+  Tags: `dev`
+
+* Channel messages uncommitted:
+  Total number of messages uncommitted.
+  Tags: `dev`
+
+* Channel acks uncommitted:
+  Total number of the messages uncommitted in all channels.
+  Tags: `dev`
+
+* Queue messages:
+  Total number of messages in queues.
+  Tags: `dev`, `op`
+
+* Queue messages ready:
+  Total number of messages ready in queues.
+  Tags: `dev`
+
+* Queue messages unacknowledged:
+  Total number of messages unacknowledged in queues.
+  Tags: `dev`
+
+* Queue message bytes:
+  Total number of bytes in messages in queues.
+  Tags: `dev`, `op`
+
+* Queue message bytes ready:
+  Total number of bytes in ready messages in queues.
+  Tags: `dev`
+
+* Queue message bytes unacknowledged:
+  Total number of bytes in unacknowledged messages in queues.
+  Tags: `dev`
+
+* Connection received octets:
+  Total number of octets received.
+  Tags: `dev`
+
+* Connection received packets:
+  Total number of packets received.
+  Tags: `dev`
+
+* Connection sent octets:
+  Total number of octets sent.
+  Tags: `dev`
+
+* Connection sent packets:
+  Total number of sent packets.
+  Tags: `dev`
+
+* Connection send pending packets:
+  Total number pending packets to be sent.
+  Tags: `dev`
+
+* Connection active channels:
+  Total number of active channels.
+  Tags: `dev`, `op`
+
+##<a id='memory_consumption_measurements'></a>Memory consumption measurements
+
+### System and RabbitMQ Configurations
+
+* System Memory = 8 GB
+* Number of Cores = 2
+* RabbitMQ version = 3.6.2
+* Default clean stats period = 300 seconds. (This higher value was set to
+  prevent any impact of the plugin's automatic clean-up mechanism.)
+
+We are using the `publish_deliver_ack` message mechanism using fanout exchange.
+This means the message types that will be handled are publish, deliver, ack and
+`deliver_gets`.
+
+All the memory values are in Kilobytes.
+
+### Some definitions
+
+* Producer = A client application process/thread that sends messages to the
+  RabbitMQ server. One producer corresponds to one AMQP channel.
+
+* Consumer = A client application process/thread that consumes messages from the
+  RabbitMQ server. One consumer corresponds to one AMQP channel.
+
+* Best case scenario = A scenario where any given client application behaves
+  either as a producer or as a consumer.
+
+* Worst case scenario = A scenario where all the client applications behaves
+  both as a producer and a consumer. So, in a worst case scenario,
+
+  ```
+  #Producers + #Consumers = #Client applications
+  ```
+
+### Measurement Configs
+
+    C0 = {#Consumers = 0,  #Queues = 0,  #Connections = 0,  #Channels = 0,
+          #Producers = 0,  #publish = 0, #deliver = 0, #ack = 0}
+    C1 = {#Consumers = 1,  #Queues = 1,  #Connections = 2,  #Channels = 2,
+          #Producers = 1,  #publish = 1, #deliver = 1, #ack = 1}
+    C2 = {#Consumers = 2,  #Queues = 2,  #Connections = 3,  #Channels = 3,
+          #Producers = 1,  #publish = 1, #deliver = 2, #ack = 2}
+    C3 = {#Consumers = 3,  #Queues = 3,  #Connections = 4,  #Channels = 4,
+          #Producers = 1,  #publish = 1, #deliver = 3, #ack = 3}
+    C4 = {#Consumers = 4,  #Queues = 4,  #Connections = 5,  #Channels = 5,
+          #Producers = 1,  #publish = 1, #deliver = 4, #ack = 4}
+    C5 = {#Consumers = 5,  #Queues = 5,  #Connections = 6,  #Channels = 6,
+          #Producers = 1,  #publish = 1, #deliver = 5, #ack = 5}
+
+### Measurements for the various data structures
+
+                                     C0     C1      C2      C3      C4      C5
+     rabbit_metrics (proplist)     = 1.15   1.15    1.15    1.15    1.15    1.15
+     channel_stats (dict)          = 0.05   0.23    0.32    0.41    0.49    0.59
+     queue_stats   (dict)          = 0.11   0.23    0.34    0.46    0.57    0.68
+     connection_stats (dict)       = 0.05   0.26    0.36    0.46    0.55    0.66
+     stat_counters (proplist)      = 0.45   0.45    0.45    0.45    0.45    0.45
+     message_counts (dict)         = 0.05   0.95    1.07    1.18    1.30    1.42
+     total_active_entities (dict)  = 0.58   0.58    0.58    0.58    0.58    0.58
+     closed_channels    (list)     = 0.0    0.07    0.11    0.14    0.18    0.21
+     process_heap_size             = 6.61   5.59    25.47   5.59    2.52    6.61
+     process_memory                = 53.39  73.0    47.3    49.3    53.39   69.7
+
+
+### Static Structures
+
+All the proplists and the `total_active_entities` dictionary remains almost
+constant. This is because they just increment/decrement integer values stored
+in them. So the memory consumed by these static structures does not grow.
+
+### Dynamic structures
+
+##### `channel_stats` dictionary
+
+Between C0 to C5, the channel_stats increases by 0.09 kb per producer/consumer.
+So,
+
+    Memory consumption for channel_stats =
+        0.05 + (0.09 * (#Producers + #Consumers)) ----> [1]
+
+##### `queue_stats` dictionary
+
+Between C0 to C5, the queue_stats increases by 0.11 kb per producer/consumer
+which creates the new queue.
+So,
+
+    Memory consumption for queue_stats =
+        0.11 + (0.11 * (#Producers that created queues +
+                        #Consumers that created the queues)) ----> [2]
+
+##### `connection_stats` dictionary
+
+Between C0 to C5, the connection_stats increases by 0.10 kb per
+producer/consumer.
+So,
+
+    Memory consumption for connection_stats =
+        0.05 + (0.10 * (#Producers + #Consumers)) ----> [3]
+
+##### `message_counts` dictionary
+
+Between C0 and C1, when 4 new message types were added to the dict, the size
+increased by 0.90 kb. So, for every new message type that is encountered, the
+`message_counts` increases on an average by 0.22 kb. That is, one message type
+with one channel data occupies 0.22 kb. Given the fact that we process 10 types
+of messages, if we have at least one channel producing at least one type of
+message, with all the 10 message types, the dict will occupy 2.2 Kb.
+
+Between C1 to C5, with four types of messages in the `message_counts` dict, for
+every new consumer/producer added, the dict increases by 0.11 kb. So, for any
+new producer/consumer added to an existing message type, the dict increases by
+0.11 / 4 = 0.027 Kb per message type.
+
+So,
+
+    Memory occupied by one message type with one channel data = 0.22 Kb
+    Memory occupied by one channel data = 0.027 kb
+    Memory occupied by other terms for one message type =
+        0.22 Kb - 0.027 = 0.193 Kb
+
+Message types can be classified into two categories.
+
+* Producer types (`publish`, `return_unroutable`, `confirm`) and
+* Consumer types (`deliver_no_ack`, `deliver`, `ack`, `get_no_ack`, `get` and
+  `redeliver`)
+
+So,
+
+* Number of Producer type messages = 3
+* Number of Consumer type messages = 6
+
+So,
+
+    Memory consumed by one producer message type content =
+        0.193 + (#Producers producing the particular producer
+                 message type * 0.027) ---> [4]
+
+    Memory consumed by one consumer message type content =
+        0.193 + (#Consumers producing the particular
+                 consumer message type * 0.027) ---> [5]
+
+As `deliver_gets` = `get` + `get_no_ack` + `deliver` + `deliver_no_ack`
+
+    Memory consumed by deliver_gets message type content =
+        0.193 + (#Consumers producing the consumer
+                 message types * 0.027) ---> [6]
+
+In the best case scenario, [4], [5] and [6] are valid.
+
+In the worst case scenario,
+
+[4] becomes
+
+    Memory consumed by one producer message type content =
+        0.193 + ((#Producers + #Consumers) * 0.027) ---> [7]
+
+[5] becomes
+
+    Memory consumed by one consumer message type content =
+        0.193 + ((#Producers + #Consumers) * 0.027) ---> [8]
+
+and [6] becomes
+
+    Memory consumed by deliver_gets message type content =
+        0.193 + ((#Producers + #Consumers) * 0.027) ---> [9]
+
+
+So,
+
+    Memory consumed by the message_counts dict =
+        0.05 +
+        (Memory consumed by one producer message type content *
+         #Producer type messages) +
+        (Memory consumed by one consumer message type content *
+         #Consumer type messages) +
+        (Memory consumed by deliver_gets message type content) ---> [10]
+
+### closed channels
+
+Every channel that gets closed, occupies 0.035 Kb in the closed channels list.
+
+So,
+
+    Memory consumed by closed channels list =
+        0.035 * #Channels closed ----> [11]
+
+
+Finally,
+
+    Total memory occupied by the plugin process =
+        (Constant memory space for proplists,
+         total_active_entities dict and
+         other variables in the process' State) +
+        [1] + [2] + [3] + [10] +
+        Default memory space occupied by an erlang process + [11]  ----> [12]
+
+In reality, the set of Producers and the set of consumers could intersect with
+each other, though not completely overlapping.
+
+##<a id='some_calculations'></a>Some calculations
+
+Based on [12] above, we have the following outcomes on a 32-bit architecture
+system.
+
+* CM = Constant Memory = 2.17 Kb
+* PM = Default Process Memory = 1.32 Kb
+* CSM = Channel Stats Memory
+* QSM = Queue Stats Memory
+* CNSM = Connection Stats Memory
+* MCM = Message Counts Memory
+* CCM = Closed Channels Memory
+* TM = Total Memory
+* P = Producer
+* C = Consumer
+
+In the best case scenario
+
+                             CSM    QSM   CNSM     MCM     CCM     TM
+    10 P and 10 C           1.85   1.21   2.04    4.68     0.7     13.98
+    100 P and 100 C        18.05  11.11  20.05   28.98     7.0     88.69
+    1000 P and 1000 C        180    110    200     271    70.0    835.69
+    10000 P and 10000 C     1800   1100   2000    2701   700.0   8305.69
+    100000 P and 100000 C  18000  11000  20000   27001  7000.0  83005.69
+
+
+In the worst case scenario
+
+                             CSM    QSM   CNSM     MCM     CCM      TM
+    10 P and 10 C           1.85   2.31   2.04    7.38     0.7      17.79
+    100 P and 100 C        18.05  22.11  20.05   55.98     7.0     126.69
+    1000 P and 1000 C        180    220    200     541    70.0    1215.69
+    10000 P and 10000 C     1800   2200   2000    5401   700.0   12105.69
+    100000 P and 100000 C  18000  22000  20000   54001  7000.0  121005.69
