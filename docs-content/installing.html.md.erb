@@ -1,24 +1,103 @@
 ---
-title: Installing and Configuring YOUR-PRODUCT-NAME
-owner: Partners
+title: Installing and Configuring WombatOAM
+owner: Erlang Solutions
 ---
 
-This topic describes how to install and configure YOUR-PRODUCT-NAME.
+This topic describes how to install and configure WombatOAM.
 
-##<a id='install'></a> Install and Configure YOUR-PRODUCT-NAME
+##<a id='install'></a> Install WombatOAM
 
 1. Download the product file from Pivotal Network.
 
-1. Navigate to the Ops Manager Installation Dashboard and click **Import a Product** to upload the product file. 
+1. Navigate to the Ops Manager Installation Dashboard and click **Import a
+   Product** to upload the product file.
 
-1. Click **Add** next to the uploaded YOUR-PRODUCT-NAME tile in the Ops Manager **Available Products** view to add it to your staging area.
+1. Click **Add** next to the uploaded WombatOAM tile in the Ops Manager
+   **Available Products** view to add it to your staging area.
 
-1. Click the newly added **YOUR-PRODUCT-NAME** tile.
+1. Click on the newly added **WombatOAM** tile.
 
-1. **This portion of the procedure should tell the users how to configure the newly added tile by walking them through the sections. Which fields should they fill out? What are the different checkboxes? Include relevant screenshots here.** 
+1. **Select the machine.**
 
 1. Click **Save**.
 
-1. Return to the Ops Manager Installation Dashboard and click **Apply Changes** to install YOUR-PRODUCT-NAME tile.
+1. Return to the Ops Manager Installation Dashboard and click **Apply Changes**
+   to install WombatOAM tile.
 
-**If needed, include additional configuration information below. For example, maybe there are configuration options not required for installation but which could be useful for certain users.**
+##<a id='logging_in'></a> Logging in to the WombatOAM Dashboard
+
+1. Click on the WombatOAM tile. Select the **Credentials** tab and click on the
+   **Links to credentials** link in the **App Credentials** row. Copy the
+   password (e.g. `axZ3hc89SxQTq7-c3h-fy0JvFl2_2HcL`), and remove the characters
+   that are neither letters nor digits (e.g. `axZ3hc89SxQTq7c3hfy0JvFl22HcL`).
+   This is the WombatOAM admin password.
+
+1. You can access WombatOAM at https://wombat.PCF-APP-DOMAIN. The user name is
+   `admin`. See the method for retrieving the password above.
+
+##<a id='adding_nodes'></a> Adding nodes to WombatOAM
+
+You can add running Erlang nodes to WombatOAM. WombatOAM will connect to those
+nodes using Erlang distribution.
+
+1. Click on the WombatOAM tile. Select the **Status** tab and make note of the
+   IP address of the WombatOAM machine.
+
+1. Find the connection details of the RabbitMQ nodes. Connect to one of the
+   machines hosting a RabbitMQ server and collect the followings:
+
+   1. Erlang node name. This can be found in the
+      `/var/vcap/store/rabbitmq/etc/rabbitmq/rabbitmq-env.conf` file. An example
+      node name is `rabbit@ee99dadbb7db7a2a11af9da424ba9920`.
+
+   1. Erlang cookie. This is stored in
+      `/var/vcap/store/rabbitmq/.erlang.cookie`. The cookie is the same across
+      the whole RabbitMQ cluster. An example cookie is
+      `5ec65769aa6defb72941a0b70080e63c`.
+
+   1. Erlang network rules. These are found in the
+      `/var/vcap/store/rabbitmq/erl_inetrc`. The `host` entries are the relevant
+      entries for us, e.g.:
+
+            {host, {10,65,179,56}, ["dddcb00baa7295e1b123f2e412b137e7"]}.
+            {host, {10,65,179,57}, ["8fc424a52a3e77c0f5be9e0fd4063a25"]}.
+
+1. Open the WombatOAM web dashboard. Select the Topology tab and the "Add Node"
+   subtab. Add WombatOAM to itself as a managed node.
+
+    1. Node name: `wombat@WOMBAT_MACHINE_IP_ADDRESS`
+    1. Cookie: `wombat`
+    1. Discover connected nodes: no
+    1. Add node.
+
+1. The WombatOAM node should appear on the left side in a few seconds.
+
+1. Select the "Services" tab, the "Execute" subtab, open the WombatOAM node
+   family in the left panel, click on the WombatOAM node name, open "Evaluate
+   Erlang expression", and evaluate the following expression (after replacing it
+   with the IP address and id in the first Erlang network rule):
+
+        wo_inet_rules:add_host({10,65,179,56}, ["dddcb00baa7295e1b123f2e412b137e7"]).
+
+1. Do the same for all network rules. This way we tell WombatOAM that when it is
+   asked to connect to a node whose host name is the given string, instead of
+   trying to resolve the host name, it should connect to the given IP address.
+   The rules are stored in WombatOAM's persistent database, so they are kept
+   when WombatOAM is restarted.
+
+1. Open the WombatOAM web dashboard. Select the Topology tab and the "Add Node"
+   subtab. Add the first managed node.
+
+    1. Node name: specify the Erlang node name collected in a previous step.
+    1. Cookie: specify the Erlang cookie collected in a previous step.
+    1. Discover connected nodes: If you would like to add a whole cluster in one
+       step, check the "Discover connected nodes" box. If you would like to add
+       only one node, don't check it.
+    1. Add node.
+
+1. The managed node should appear on the left side in a few seconds. Repeat this
+   step for each node you would like to add.
+
+Now WombatOAM is collecting metrics, notifications and alarms from the added
+Erlang nodes, and it lets you to inspect the nodes and perform operations on
+them.

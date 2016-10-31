@@ -1,0 +1,188 @@
+---
+title: Notifications
+owner: Erlang Solutions
+---
+
+Wombat shows notifications that occur on managed nodes on the web dashboard's
+Notifications tab. A message appears for each notification, and all messages
+increment the counter badge on the Notifications tab.
+
+In addition to the built-in notifications (listed below), Wombat also collects
+log entries from the `error_logger` module and the `lager` application if they are
+present on the managed node.
+
+Tags are assigned to notifications enabling role based information retrieval.
+All notifications are tagged with the `dev` and `op` tags by default, which can
+be overridden by adding the following line to `wombat.config`.
+
+```erlang
+{set, wo_logs, default_tags, [<<"Tag1">>, <<"Tag2">>]}.
+```
+
+##<a id='viewing_notifications'></a>Viewing notifications
+
+By default, only logs at warning level and above are collected. You can change
+this on the web dashboard on a per-node basis. On the "Notifications" tab,
+select the node, and then use the options under "Change log level on selected
+node".
+
+To view details for an entry, click the arrow button on the right. To find
+specific log entries, you can use the "Application filter" box and "Search in
+logs" box above the list of notifications.
+
+If new logs arrive after you have opened the page, Wombat will show a message
+above the list of notifications, with a link to show the new entries. To view
+entries older than the those that are visible, use the buttons below the list.
+
+##<a id='mailing_notifications'></a>Mailing notifications
+
+Wombat can be configured to email some or all collected notifications to any
+number of recipients. At the moment it is only possible to filter notifications
+by specifying the minimum severity they should have to be emailed.
+
+There are plans to also include other filters such as the actual list of
+severities, a regular expression the notification message must contain and
+the possibility to send abridged emails that contain the last `n`
+notifications.
+
+The details on how to configure this mailer feature can be found in the
+"[Configuration][configuration]" section.
+
+##<a id='builtin_notifications'></a>Built-in notifications
+
+### Busy port
+
+Triggered by a system monitor on busy ports. A process in the system was
+suspended because it was sending to a busy port. This notification is disabled
+by default, see the documentation of the [`code_tracer`][codetracer] plugin on
+how to enable it.
+
+### Busy dist port
+
+Triggered by a system monitor on busy dist ports. A process in the system was
+suspended because it was sending to a process on a remote node whose inter-node
+communication was handled by a busy port. This notification is disabled by
+default, see the documentation of the [`code_tracer`][codetracer] plugin on how
+to enable it.
+
+### Long GC
+
+Triggered by a system monitor by an unusually long garbage collection. A garbage
+collection in the system took longer than expected. This notification is
+disabled by default, see the documentation of the [`code_tracer`][codetracer]
+plugin on how to enable it.
+
+### Long schedule
+
+Triggered by a system monitor as a result of a process hogging the scheduler. A
+process or port in the system has been running uninterrupted for a longer time
+than expected. This notification is disabled by default, see the documentation
+of the [`code_tracer`][codetracer] plugin on how to enable it.
+
+### Large heap
+
+Triggered by a system monitor due to an unusually large heap. A garbage
+collection in the system resulted in the size of a heap being unusually large.
+This notification is disabled by default, see the documentation of the
+[`code_tracer`][codetracer] plugin on how to enable it.
+
+### Crash dump saved
+
+A crash dump was saved for inspection. Erlang produces a crash dump file if the
+runtime terminates abnormally. This can occur because of depletion of memory,
+or if a supervisor cannot recover a given supervision tree.
+
+### Code loaded
+
+A module was loaded in the system.
+
+### Code purged
+
+Modules were purged from the system.
+
+### Shell command
+
+A shell is evaluating an expression.
+
+### SASL error report
+
+An error report was logged.
+
+### SASL warning
+
+A warning was logged.
+
+### SASL crash report
+
+A crash report was logged.
+
+### SASL info report
+
+An info report was logged.
+
+### Scheduler sleeps
+
+Indicates a change in the number of online schedulers.
+
+### Scheduler wakes up
+
+Indicates a change in the number of online schedulers.
+
+[configuration]: configuration.md#configuration-reference
+[codetracer]: plugins/code_tracer_plugin.md
+
+##<a id='configuring_logging'></a>Configuring logging
+
+In the configuration files Wombat users can set the behaviour of the following
+two types of log files where collected logs from the managed nodes will be
+stored.
+
+- wombat log files: With default options all logs excluding the evaluated shell
+  commands will be stored in these files.
+  In the config the size of one file, and the size of all log files can be set
+  with the options shown below. (In the example, we set the size of one log
+  file to 500 Kilobytes, and the size of all log files to 10 Gigabytes.)
+
+```erlang
+% size of one log file in bytes
+{set, wo_logs, wo_logs_disklog, log_file_size, 512000}.
+
+% size of all logs in bytes
+{set, wo_logs, wo_logs_disklog, log_max_size, 10737418240}.
+```
+
+- backup log files: Using filters we can define what type of log items will be
+  written to the backup log files. These files will have the same size as the
+  log files (`log_file_size` option will be used), but the size of all backup
+  logs is not limited by the `log_max_size` config option. However, with the
+  current implementation the number of all backup logs are limited to 50,000.
+
+By default all log entries about the evaluated shell commands will be stored in
+the backup logs, and everything else in the logs.
+
+The log file size and the size of all log files are defined in the config
+files. The default options are:
+
+- Log file size: 20 MB
+- Size of all logs: 2 GB
+
+Example configuration:
+
+```erlang
+% size of one log file in bytes
+{set, wo_logs, wo_logs_disklog, log_file_size, 500000}.
+
+% size of all logs in bytes
+{set, wo_logs, wo_logs_disklog, log_max_size, 10000000000}.
+%
+% A list of filter expressions used to configure log entries
+% which will never be deleted
+%
+% Use one of the following expressions for filtering:
+% {originator, Originator :: binary()}
+% {node_id, NodeId :: binary()}
+% {node_family_id, NodeFamilyId :: binary()}
+% {message, Message :: binary()}
+%
+{set, wo_logs, wo_logs_disklog, backup_filters, []}.
+```

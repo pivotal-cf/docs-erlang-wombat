@@ -1,0 +1,107 @@
+---
+title: WombatOAM Dashboard
+owner: Erlang Solutions
+---
+
+This topic describes how the WombatOAM Dashboard can be used.
+
+##<a id='wombatoam_dashboard'></a>WombatOAM Dashboard
+
+WombatOAM's monitoring features are accessible from the web dashboard. You can use
+the dashboard to manage nodes, and view metrics, notifications and alarms. The
+following is an overview of WombatOAM's monitoring features, with details about
+how to access these features, where relevant.
+
+##<a id='topology'></a>Topology
+
+Topology is an entry point for all tools that allow you to inspect and monitor
+a node as a whole.
+
+- Add nodes: **Topology** → **Add Node**. If you select the "Discover connected
+  nodes" checkbox, all nodes that are connected to the given node (including
+  hidden nodes) that have the same cookie will be installed into WombatOAM.
+- View node information: **Topology** → **Node Info** → select a node or
+  node family.
+- Observe the status of the nodes (UP/DOWN) in the node tree panel. WombatOAM
+  automatically recognizes if a node goes down or if it comes up again.
+- View plugin information, plugin state, and turn plugins on or off.
+- Remove nodes or node families: **Topology** → **Node Info** → select
+  a node or node family → **Remove node** or **Remove node family**.
+- View a visual representation of the system: **Topology** → **Node Graph**.
+
+##<a id='metrics'></a>Metrics
+
+Metrics are useful for recognising trends and troubleshooting systems if failure
+occurs. Nodes are grouped by families, so you can view metrics for a family or
+for individual nodes. Different metrics can be combined on the same graph.
+
+- View numeric metrics: **Metrics** → **Numeric Metrics** → select a node →
+  select a metric. A new data point in the total memory graph arrives every 60
+  seconds (configurable). If you select a node family, the metrics of the nodes
+  are stacked onto each other.
+- WombatOAM has 90 built-in metrics; it also collects [folsom][folsom]
+  and [exometer][exometer] metrics
+  created on the node, as well as metrics from custom plugins,
+  allowing you to combine business and system metrics.
+- WombatOAM can push the metrics to other OAM tools. This means that you can
+  integrate WombatOAM metrics with other metrics that aren't Erlang-related.
+  See the "[Integration with third-party tools][integration]" section.
+
+<!--
+- Superimpose metrics: Click the "pin" icon above the graph so that it is
+  highlighted. If you now select a different metric, the previous metric remains
+  visible. You can add any number of metrics. To remove a metric, click on it
+  again, or click the **Metrics** button and then click the "eye" icon next to
+  the metric.
+-->
+
+##<a id='notifications'></a>Notifications
+
+ With Notifications, you can view important crash and error reports from all
+ nodes in one place. When a crash occurs, this should be the first port of call.
+ All alarms raised and cleared are also logged under Notifications, along with
+ all shell interactions, modules loaded and purged, and so forth.
+
+- View notifications: **Notifications** → **Manage Notifications** → select a
+  node. WombatOAM displays logs created with `error_logger` or `lager` from the
+  managed nodes.
+- Search notifications: **Notifications** → **Manage Notifications** → enter a
+  value in the search box.
+- Popup notifications are shown for events that are at "error" level or higher.
+- The level of log entries to be collected is configurable.
+
+##<a id='alarms'></a>Alarms
+
+You should check alarm logs regularly, and address them if necessary.
+All alarms raised and cleared are also logged under Notifications, in case
+you miss an alarm being raised and cleared.
+
+- View alarms: **Alarms** → **Manage Alarms**. This shows the alarms raised by
+  WombatOAM (for example, if a node went down). Alarms can also be cleared by
+  WombatOAM (for example, when a node comes up again).
+- Users can acknowledge, unacknowledge, clear, and comment on alarms.
+- The web dashboard displays popup notifications for new alarms.
+- WombatOAM generates notifications from alarm events (displayed in the
+  **Notifications** tab).
+
+##<a id='front_page'></a>Front page
+
+If you click on the WombatOAM icon or WombatOAM text, you will see the front page
+with selected information (metrics, alarms, node statistics). Users can create
+their own pages with the following constraints:
+
+- Every page has a name which is unique.
+- Users can create, modify or delete pages.
+- It is not allowed to modify or delete a page that is not owned by the user,
+  except if it is not owned by anyone.
+- The admin user can create, modify or delete any page, but even the admin
+  cannot delete the default page.
+- When a user is deleted, the admin can decide whether to delete the user's
+  pages too. If they are not deleted, they will not be owned by anyone.
+- If authentication is switched off, users have the same rights as admins when
+  authentication is on.
+
+[exometer]: https://github.com/Feuerlabs/exometer
+[folsom]: https://github.com/boundary/folsom
+[graphite]: http://graphite.readthedocs.org/en/latest/
+[integration]: integration.md

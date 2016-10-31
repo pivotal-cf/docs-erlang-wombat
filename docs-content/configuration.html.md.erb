@@ -1,0 +1,691 @@
+---
+title: Configuration
+owner: Erlang Solutions
+---
+
+This topic describes how to configure WombatOAM.
+
+##<a id='wombatconfig_and_sysconfig'></a>wombat.config and sys.config
+
+The main WombatOAM configuration file is `rel/wombat/files/wombat.config`. The
+following example shows its file format:
+
+```erlang
+%% Disable authentication for the REST interface.
+{set, wo_rest, enable_authentication, false}.
+
+%% Modify the shell_history_size thresholds of the alarm plugin.
+{set, wo_plugins, plugins, alarm, system_checks, shell_history_size,
+ [{minor, 10000}, {major, 20000}]}.
+
+%% Disable the code_tracer plugin.
+{unset, wo_plugins, plugins, code_tracer}.
+```
+
+See the "Configuration file format" section below for more information.
+
+**Note:** After each configuration tuple in `wombat.config`, a period (`.`) is
+needed.
+
+WombatOAM needs to be restarted for the changes in `wombat.config` to take an
+effect, but no other action (such as regenerating the release) is needed.
+
+The configuration examples in the documentation always apply to `wombat.config`
+(unless specified otherwise).
+
+The default values of the configuration parameters can be found in the
+`rel/wombat/wombat/releases/<version>/sys.config` file.  Modifying this file is
+not recommended, since it is generated from `rel/wombat/files/sys.config` and
+`rel/wombat/files/vars` during release generation and thus easily overwritten.
+
+There is also a legacy configuration file called `rel/wombat/files/user.config`.
+This works similarly to `wombat.config`, but uses the traditional `sys.config`
+format, which makes it more difficult to override embedded configuration
+entries.
+
+## <a id='vars_and_vmargs'></a>vars and vm.args
+
+See the default virtual machine settings in the following files:
+
+* `rel/wombat/files/vars`
+* `rel/common/vm-hidden.args`
+
+It is allowed to change any of these settings. The settings often modified
+(WombatOAM's node name, IP address, ports etc.) are described below.
+After the modifications, execute `generate.sh` (when WombatOAM is stopped) for the
+changes to take an effect. `generate.sh` reads both files above and it
+generates `rel/wombat/wombat/releases/<version>/vm.args` by filling in the
+variables in `vars` to `vm-hidden.args`.
+
+## <a id='changing_wombatoams_node_name_and_ip_address'></a>Changing WombatOAM's node name and IP address
+
+WombatOAM runs on 127.0.0.1 by default and uses the `wombat@127.0.0.1` node name,
+but you can change this behaviour to run WombatOAM on any required IP and using any
+node name.
+
+*Important:* Changing the node name/IP address creates a new empty database.
+The new database will be placed in different directories within the wombat
+directory. It also overwrites any changes made to `sys.config` and `vm.args`.
+
+To change the name/IP address, please follow these steps:
+
+1. Ensure that WombatOAM is stopped.
+2. Edit `rel/wombat/files/vars` and change the IP address in `node` and
+   `node_arg` to the required value. For example, change `'wombat@127.0.0.1'` to
+   `'wombat@192.168.1.1'`.
+3. Execute `./generate.sh`. This script reads `rel/wombat/files/vars` and
+   modifies `sys.config` and `vm.args` accordingly.
+4. Restart WombatOAM with `./start.sh`.
+
+## <a id='local_ports_used_by_wombatoam'></a>Local ports used by WombatOAM
+
+WombatOAM binds to one local port. This can be changed e.g. if another
+application uses the same port or if you want to run two WombatOAM instances on
+the same machine. (In the latter case, the node name also needs to be changed;
+see the previous section.)
+
+* Dashboard HTTP port (default: TCP port 8080): This can be changed in
+  `rel/wombat/files/wombat.config`. Restarting WombatOAM is enough for this change
+  to take an effect.
+
+## <a id='logging_configuration'></a>Logging configuration
+
+The following options can be used to configure logging.
+
+```erlang
+% size of one log file in bytes
+{set, wo_logs, wo_logs_disklog, log_file_size, 500000}.
+
+% size of all logs in bytes
+{set, wo_logs, wo_logs_disklog, log_max_size, 10000000000}.
+%
+% A list of filter expressions used to configure log entries
+% which will never be deleted
+%
+% Use one of the following expressions for filtering:
+% {originator, Originator :: binary()}
+% {node_id, NodeId :: binary()}
+% {node_family_id, NodeFamilyId :: binary()}
+% {message, Message :: binary()}
+%
+{set, wo_logs, wo_logs_disklog, backup_filters, []}
+```
+
+## <a id='configuring_the_web_interface'></a>Configuring the web interface
+
+The default web dashboard can be accessed on port 8080 under HTTP.
+
+```erlang
+{set, wo_rest, http_port, 8080}.
+```
+
+Change the value of `http_port` to the port on which the web dashboard and
+REST API should listen.
+
+SSL is disabled by default, nonetheless, it is supported by WombatOAM.
+If SSL is enabled, the dashboard uses a self-signed root certificate by default
+that is considered 'not trusted' by browsers. If you need to change any related
+configuration, you can edit the `wombat.config` file.
+
+```erlang
+{set, wo_rest, https_port, 8443}.
+```
+
+Change the value of `https_port` to the port on which the web dashboard and
+REST API should listen.
+
+```erlang
+{set, wo_dashboard, enable_force_ssl, true}.
+```
+
+To disable SSL, change the value of `enable_force_ssl` to `false`.
+
+```erlang
+{set, wo_rest, cacert, "/absolute_path/to/certificate/authority/file"}.
+```
+
+Change the value of `cacert` to the absolute path of the file containing PEM
+encoded CA certificates (trusted certificates used for verifying a peer
+certificate).
+
+```erlang
+{set, wo_rest, cert, "/absolute_path/to/certificate/file"}.
+```
+
+Change the value of `cert` to the absolute path of the file containing the PEM
+encoded user certificate.
+
+```erlang
+{set, wo_rest, key, "/absolute_path/to/private/key/file"}.
+```
+
+Change the value of `key` to the absolute path of the file containing the user's
+private PEM encoded key.
+
+```erlang
+{set, wo_rest, enable_authentication, true}.
+```
+
+In order to switch off authentication change the value of `enable_authentication`
+to `false`.
+
+```erlang
+{set, wo_rest, default_user_tags, all}.
+```
+
+In order to change the [tags][tagsdoc] that new users will be created with or
+the tags that are used by the REST layer when the authentication is switched
+off, change the value of `default_user_tags` to either `all` or a list of tags
+represented as binary strings. If `all` is set, all information available in
+WombatOAM will be retrieved, otherwise metrics, notifications and alarms that are
+not tagged with any of the listed tags will be removed from the results.
+
+
+## <a id='security_modes'></a>Security modes
+
+WombatOAM can run in multiple security modes which present some requirements for
+its configuration or restrictions in its capabilities.
+
+By default it starts up in *Local-only* security mode when there are no
+configuration requirements but usage is restricted to monitor only nodes running
+on the same host as WombatOAM. The Dashboard and REST interface is also only
+available on localhost. (All defaults in vm.args and sys.config reflect this
+mode to help easy trialling.)
+
+When WombatOAM node name is changed to include a hostname or IP address other
+than the loopback address WombatOAM will switch to operate in *Distributed*
+security mode. In this mode any node can be monitored but certain security
+settings are required in order to enforce production-level security:
+
+- Authentication must be enabled (It is strongly advised to change the default
+  password of the admin user at first login)
+- If HTTPS is enabled certificates must be explicitly configured
+- If the Dashboard should be accessible outside a private network and HTTPS is
+  not enabled it is strongly advised to place a proxy (like Apache or NGINX) in
+  front of WombatOAM. (See sections with proxy configuration examples below.)
+
+### Sample configurations
+
+This is a sample configuration for Local-only mode turning off both https and
+authentication:
+
+```erlang
+%% customise http port
+{set, wo_rest, http_port, 8080}.
+
+%% disable authentication
+{set, wo_rest, enable_authentication, false}.
+
+%% disable SSL - use plain HTTP
+{set, wo_dashboard, enable_force_ssl, false}.
+```
+
+And this is another one for Distributed mode with custom certificates:
+
+```erlang
+%% location of PEM encoded CA and host certificates
+{set, wo_rest, cacert, "/absolute_path/to/certificate/authority/file"}.
+{set, wo_rest, cert, "/absolute_path/to/certificate/file"}.
+
+%% location of PEM encoded unencrypted private key
+{set, wo_rest, key, "/absolute_path/to/private/key/file"}.
+
+%% customise https port
+{set, wo_rest, https_port, 8443}.
+
+%% enable SSL/HTTPS
+{set, wo_dashboard, enable_force_ssl, true}.
+
+%% enable authentication
+{set, wo_rest, enable_authentication, true}.
+```
+
+## <a id='short_node_names'></a>Short node names
+
+WombatOAM can manage nodes with long names and
+short names at the same time. It is not necessary to change the
+name of the WombatOAM node to manage nodes with short names.
+
+When adding short-named nodes, use the names that are returned by the `node()`
+function, i.e. `<short node name>@<host>` where `<host>` is the first part of
+the host name.
+
+## <a id='opening_firewall_ports'></a>Opening firewall ports
+
+This section describes which ports need to be open if there is a firewall
+between WombatOAM and the managed nodes.
+
+WombatOAM connects to the managed nodes via Erlang distribution, which needs the
+port used by EPMD (Erlang Port Mapper Daemon) to be open. EPMD uses TCP port
+4369 by default.
+
+You also need to make sure that the Erlang Distribution traffic can flow between
+WombatOAM and the managed nodes, for which there are two ways:
+
+* Enable all incoming TCP ports from WombatOAM to the managed nodes. (I.e.
+  WombatOAM should be able to open new TCP connections towards the managed
+  nodes.)
+* Set a custom TCP port range for Erlang Distribution on the managed nodes, and
+  set those ports in the firewall as incoming ports towards the managed nodes.
+
+Details for the second option: WombatOAM communicates with the managed nodes
+via Erlang Distribution. By default, Erlang does not specify any port range to
+be used for Erlang Distribution traffic. Instead, Erlang uses the first
+available port in the system. This can be changed by configuring the
+`inet_dist_listen_min` and `inet_dist_listen_max` configuration parameters of
+the `kernel` Erlang application:
+
+```erlang
+{kernel,
+ [{inet_dist_listen_min, 9100},
+  {inet_dist_listen_max, 9200},
+  ...]
+}.
+```
+
+This modification needs to be performed on the managed nodes. In most Erlang
+applications, it can be set in the [`sys.config` file][sys_config]. In case of
+Riak 1.x nodes, [this setting can be set in the `app.config` file][riak1]. In
+case of Riak 2.x nodes, [it can be set in `riak.conf`][riak2].
+
+[sys_config]: http://erlang.org/doc/man/config.html
+[riak1]: http://docs.basho.com/riak/1.4.12/ops/advanced/security/
+[riak2]: http://docs.basho.com/riak/2.1.1/ops/advanced/security/#Inter-node-Communication
+
+## <a id='configuring_apache'></a>Configuring Apache
+
+If you would like to access WombatOAM via Apache as a proxy, the following Apache
+configuration file example shows how to forward both the HTTP and the web socket
+traffic to WombatOAM. It assumes WombatOAM is listening on 127.0.0.1:8080, and that it
+will be accessed under `http://<my_server>/wombat/`). The `/wombat/` URL path
+can be changed by modifying the rules.
+
+```
+<VirtualHost *:80>
+ServerName localhost
+
+ProxyRequests Off
+ProxyPreserveHost On
+
+RewriteEngine On
+RewriteRule ^/wombat$ /wombat/ [R=301,L]
+
+ProxyPass /wombat/api/core/ws ws://127.0.0.1:8080/api/core/ws
+ProxyPassReverse /wombat/api/core/ws ws://127.0.0.1:8080/api/core/ws
+ProxyPass /wombat/ http://127.0.0.1:8080/
+ProxyPassReverse /wombat/ http://127.0.0.1:8080/
+
+LogLevel debug
+</VirtualHost>
+```
+
+## <a id='configuring_nginx'></a>Configuring NGINX
+
+If you would like to access WombatOAM via NGINX as a proxy, the following NGINX
+configuration file example shows how to forward both the HTTP and the web socket
+traffic to WombatOAM. It assumes WombatOAM is listening on 127.0.0.1:8080, and that it
+will be accessed under `http://<my_server>/`).
+
+```
+location / {
+
+  proxy_set_header   Host $host;
+  proxy_set_header   X-Real-IP $remote_addr;
+  proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header   X-Forwarded-Proto $scheme;
+  proxy_http_version 1.1;
+  proxy_set_header   Upgrade $http_upgrade;
+  proxy_set_header   Connection  "upgrade";
+
+  proxy_pass          http://127.0.0.1:8080;
+  proxy_read_timeout  1800;
+}
+```
+
+## <a id='running_wombatoam_in_the_foreground'></a>Running WombatOAM in the foreground
+
+Executing `./start.sh` will start the WombatOAM server in the background and return
+the prompt. Using `./start-fg.sh`, the WombatOAM server can be started in the
+foreground, so that it will not return the prompt, only when the server
+terminated. Instead, it will print the error and warning log entries to the
+standard output while the WombatOAM server is running. This is useful for example
+when running WombatOAM inside a Docker container.
+
+## <a id='configuration_file_format'></a>Configuration file format
+
+The configuration entries are organized into a tree. `wombat.config` contains a
+number of tuples, each of which modifies one leaf or branch of this tree. Leaves
+and branches can be replaced (with the `set` command) and deleted (with the
+`unset` command). The elements of the tuple (after the command) specify the path
+from the root of the configuration tree towards the leaf or branch to be
+modified or deleted. In case of the `set` command, the last element of the tuple
+is not a part of the part, but it defines the new value for the leaf or branch.
+
+The available commands in `wombat.config` are the following:
+
+```erlang
+{set, AppName, ParamName, Path1, ..., PathN, Replacement}.
+```
+
+Sets the value of a given configuration entry to the given value.
+
+```erlang
+{replace, AppName, ParamName, Path1, ..., PathN, Replacement}.
+```
+
+Sets a given configuration entry to the given value. The difference between
+`set` and `replace` is that the former sets only the value, while the latter the
+entry itself. Compare `{set, myapp, myparam, a, 1}` and `{replace, myapp,
+myparam, a, {a, 1}}`, which perform the same task. The latter can be used to
+set not only a pair, but also a longer tuple as a configuration entry.
+
+```erlang
+{unset, AppName, ParamName, Path1, ..., PathN}.
+```
+
+Deletes the given configuration entry.
+
+## <a id='configuration_reference'></a>Configuration reference
+
+- `wo_dashboard/enable_orch` (`boolean()`): Whether the dashboard should show
+  the "Orchestration" tab.
+
+- `wo_dashboard/enable_topo_graph` (`boolean()`): Whether the dashboard should
+  show the "View node graph" subtab in the Topology tab.
+
+- `wo_rest/http_port` (`integer()`): The HTTP port of the REST interface and
+  the Dashboard.
+
+- `wo_rest/hide_cookie` (`boolean()`): Whether the cookie values of nodes should
+  be hidden on the dashboard and REST interface. Default is false.
+
+- `wo_license/license` (`string()`): The license key to be use by WombatOAM.
+
+    ```erlang
+    {set, wo_license, license, "MYLICENCE"}.
+    ```
+
+- `wo_core/node_monitor_max_wait` (`integer()`): The maximum number of
+  milliseconds that WombatOAM should wait between trying to reconnect to "DOWN"
+  nodes.
+
+- `wo_metrics/backend` (`mnesia | seq_file`): Specifies which back end to use.
+
+- `wo_metrics/gauges`: Specifies what gauges should be visible on the
+  "Metrics/Gauges" tab, and what their minimum and maximum values for different
+  nodes should be. The node names are matched against the specified regular
+  expressions, and the first match is used.
+
+  Example:
+
+```erlang
+{set, wo_metrics, gauges,
+ [{total_memory,
+   [{range,
+     [{"wombat@127.0.0.1", {0, 1500000000}}, % 100MB
+      {"riak.*", {0, 200000000}}, % 200MB
+      {".*", {10000000, 30000000}}]}]}, % 10-30MB
+  {cpu_avg1,
+   [{range,
+     [{"{{node}}", {0, 5}},
+      {"riak.*", {0, 2}}]}]},
+  {{riak_core, handoff_timeouts},
+   [{range,
+     [{"riak.*", {0, 10}}]}]}]}.
+```
+
+- `wo_metrics/graphite`: Configures the connection to [Graphite][graphite]. If
+  not configured, WombatOAM will not push metrics to Graphite.
+
+  Example:
+
+```erlang
+{set, wo_metrics, graphite,
+ [{carbon_host, "127.0.0.1"},
+  {carbon_udp_port, 2003}]}.
+```
+
+- `wo_metrics/datadog`: Configures the connection to [Datadog][datadog]. If
+  not configured, WombatOAM will not push metrics to Datadog.
+
+  Example:
+
+```erlang
+{set, wo_metrics, datadog,
+ [{host, "localhost"},
+  {port, 8125},
+  {send_metrics, true},
+  {send_notfications, true}]}.
+```
+
+- `wo_metrics/threshold_templates`: Configure templates for threshold based
+  alarms. See details in [Threshold based alarms][threshold-alarms]
+
+- `wo_metrics/threshold_sets`: Configure rule sets for threshold based
+  alarms. See details in [Threshold based alarms][threshold-alarms]
+
+[threshold-alarms]: alarms.md#threshold-based-alarms
+
+- `wo_alarms/repeat_notifications` (`boolean()`): If an alarm is raised, WombatOAM
+  sends a notification about it. If this option is `true`, WombatOAM will also send
+  notifications when the alarm is re-raised. You may turn this off if you do not
+  want to get notifications when alarms are re-raised without first being
+  cleared.
+
+- `wo_alarms/ignore_missing_module` (`string`): No `missing_module` alarm will
+  be raised for module names which match the given regular expression.
+
+- `wo_alarms/ignore_different_module_versions` (`string`):
+  No `different_module_versions` alarm will be raised for module names which
+  match the given regular expression.
+
+- `wo_alarms/ignore_missing_application` (`string`): No `missing_application`
+  alarm will be raised for application names which match the given regular
+  expression.
+
+- `wo_alarms/ignore_different_application_versions` (`string`):
+  No `different_application_versions` alarm will be raised for application names
+  which match the given regular expression.
+
+- `wo_alarms/ignore_different_timezones` (`boolean`):
+  No `different_timezones` alarm will be raised if it is `true`.
+
+- `wo_plugins/capabilities_period` (`integer()`): Specifies the frequency used
+  to retrieve the capabilities from the plugins running on the managed node.
+  Metrics created dynamically on the managed node using Folsom or Exometer will
+  only start appearing on the dashboard after a new capabilities check is
+  performed.
+
+- `wo_plugins/sampling_default`: Specifies the retention rules for gathering and
+ keeping metrics from the nodes through the plugins running on the managed node.
+
+ The format of the retention rules is similar to the one used by Graphite.
+ For example, "1m:1h" means that that each data point represents 1 minute, and
+ you want to keep enough data points so that they add up to 1 hour of data.
+
+ The web interface uses the metrics stored in the first retention period to
+ serve the "last hour" graphs, the second period to serve the "last day"
+ graphs, and the third period to serve the "last week" graph. Note that if you
+ set the second period to keep only the last 12 hours, for example, the
+ first part of the "last day" graph will always be empty.
+
+ It is strongly recommended to keep all the 3 metric series. However, you can
+ freely modify the data frequency (the number before the colons).
+
+ Example:
+
+ ```
+ {set, wo_plugins, sampling_default, "1m:1h 5m:1d 15m:7d"}.
+ ```
+
+ This is the default value used for all the plugins, but it is also possible to
+ specify a value following this format by adding a tuple `{sampling, SamplingValue}`
+ to the list of options for the plugin in order to override the default value
+ for that specific plugin.
+
+- `wo_plugins/hidden_config_params`: Specifies which configuration parameters to
+  hide. E.g. if you have a `myapp` application that has a `password`
+  configuration parameter, and you don't want its value to be shown to the
+  WombatOAM users, you can add the following line to `wombat.config`:
+
+ ```
+ {set, wo_plugins, hidden_config_params, [{myapp, password}]}.
+ ```
+
+ If you want a plugin to use a different list than the other plugins, that can
+ be achieved by setting the `hidden_config_params` plugin option:
+
+ ```
+ {set, wo_plugins, plugins, myplugin, hidden_config_params,
+  [{myapp, password}]}.
+ ```
+
+- `wo_plugins/hidden_ets_tables`: Specifies which ETS tables to hide. E.g. if
+  you have an ETS table called `passwords`, and you don't want its content to be
+  shown to the WombatOAM users, you can add the following line to `wombat.config`:
+
+ ```
+ {set, wo_plugins, hidden_ets_tables, [passwords]}.
+ ```
+
+ If you want a plugin to use a different list than the other plugins, that can
+ be achieved by setting the `hidden_ets_tables` plugin option:
+
+ ```
+ {set, wo_plugins, plugins, myplugin, hidden_ets_tables, [passwords]}.
+ ```
+
+- `wo_plugins/plugin_action_verbosity`: This is a list that specifies the
+  verbosity level for different plugins. When a plugin starts, sends metrics,
+  etc, we might generate a notification based on the log level that belongs to
+  this action and verbosity configured for the plugin.
+
+  Each plugin has a verbosity level and there is also a default verbosity level.
+  The following example configuration will generate plugin notifications for
+  events on a warning level or above for all plugins, except for the
+  builtin_metrics plugin, where even debug-level notifications will be
+  generated:
+
+  ```erlang
+  {set, wo_plugins, plugin_action_verbosity, default, <<"warning">>}.
+  {set, wo_plugins, plugin_action_verbosity, builtin_metrics, <<"debug">>}.
+  ```
+
+  Note that the value of this configuration option is always read on-demand by
+  WombatOAM when needed, so modifying it in a running WombatOAM will take immediate
+  effect. For example executing the following line in the WombatOAM shell will
+  start generating debug-level notifications for the observer_ets plugin, while
+  setting back the verbosity of all other plugins to the default value:
+
+  ```erlang
+  application:set_env(wo_plugins, verbosity, [{observer_ets, <<"debug">>}]).
+  ```
+
+  Or, if you manage WombatOAM with WombatOAM, you can open the WombatOAM Dashboard, go
+  to the Services → Configure → WombatOAM node → "Set a configuration parameter" →
+  Fill in the following data and click Add:
+
+  - "Application": `wo_plugins`
+  - "Configuration parameter name": `verbosity`
+  - "The value to be set": `[{observer_ets, <<"debug">>}]`
+
+- `wo_plugins/plugins:` List of configuration items for the plugins that run on
+ the managed node. There must be one configuration item for each available
+ plugin. The configuration elements have the format
+ `{PluginName, Apps, ExtraModules, Options}` where `PluginName` is the short
+ name of the plugin, `Apps` is the list of OTP applications the plugin depends
+ on (those apps must be running on the managed node for the plugin to start),
+  `ExtraModules` is the list of additional modules included in the plugin besides
+ the main module, and `Options` is the list of options specific for that plugin.
+ Within that list of options it is possible to specify the sampling and
+ retention rules specific to a plugin as explained in the previous section.
+
+ Regarding the list of `Apps` it is either a list or a tuple of two-tuples of the form
+ `{AppName, RegularExpression}` where the regular expression provided is matched using
+ the functionalities of the Erlang `re` module with the application version.
+ (See Erlang documentation). The plugin will only start when there is a match as
+ a result of the evaluation. If we intend to match any version of the app, the
+ `".*"` regular expression can be used, as in the following example.
+
+ Example:
+
+```erlang
+{set, wo_plugins, plugins,
+ [{mnesia,
+   [{mnesia, ".*"}],
+   [wombat_plugin_mnesia_metrics],
+   [{activity_events, false},
+    {table_events, none},
+    {table_metrics,all},
+    {metrics_period, 5000}]}]}.
+```
+
+- `wo_orch/private_key` (`string()`): The path to the private key to be used
+  when connecting to an instance. Example: `"/Users/myuser/.ssh/id_rsa"`
+
+- `wo_orch/public_key` (`string()`): The path to the public key to be used
+  when connecting to an instance. Example: `"/Users/myuser/.ssh/id_rsa.pub"`
+
+- `wo_orch/home_dir` (`string()`): The path to be contain the deployed nodes on
+  the managed hosts. It is the home directory of the user by default.
+
+- `wo_orch/cloud-prefix` (`string()`): A prefix to be used when naming
+  instances, SSH keys, etc. in the cloud. For example, if you specify
+  `"mycloud-"`, all instances will be named `"mycloud-<UUID>"`.
+
+- `wo_orch/hook_dirs` (`[string()]`): Directories that may contain modules (BEAM
+  files) that should be loaded into WombatOAM. These modules can then be called
+  from deployment hooks.
+
+  Example:
+
+```erlang
+{set, wo_orch, hook_dirs, ["/home/user/my_wombat_hook_dir"]}.
+```
+
+- `wo_logs/mail_sender` (`string()`): The email address used as the `From` field
+  when emails are sent. Example: `"user@mail.com"`
+
+- `wo_logs/mail_recipients`  (`[string()]`): A list of email addresses where mails
+  are sent. Example: `["person@mail.com", "another.person@mail.com"]`
+
+- `wo_logs/mail_severity` (`atom()`): A severity value specifying the minimum
+  required severity a notification must have in order for it to be emailed.
+  Example: `error`
+
+- `wo_logs/gen_smtp_options`: The configuration values for the SMTP client
+  used, [gen_smtp][].
+
+ Example:
+
+```erlang
+{set, wo_logs, gen_smtp_options,
+ [{relay, "localhost"},
+  {username, "username123"},
+  {password, "password123"},
+  {port, 25}]}.
+```
+
+- `wo_logs/graylog`: The configuration values for Graylog log management tool,
+  [graylog][].
+
+ Example:
+
+```erlang
+{set, wo_logs, graylog,
+   [{host, "localhost"},
+    {port, 12201},
+    {inet_family, inet}
+    %% ipv4 = inet | ipv6 = inet6
+    {level, info},
+    %% level = debug | info | notice | warning | error | critical | alert | emergency
+    {additional_fields, [{service, "WombatOAM"}]},
+    {send_notifications, all}
+   ]}.
+```
+
+[graphite]: http://graphite.readthedocs.org/en/latest/
+[datadog]: https://www.datadoghq.com/
+[gen_smtp]: https://github.com/Vagabond/gen_smtp
+[graylog]: https://www.graylog.org/
+[tagsdoc]: tags.md

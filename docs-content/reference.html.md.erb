@@ -1,0 +1,37 @@
+---
+title: WombatOAM reference
+owner: Erlang Solutions
+---
+
+##<a id='logs'></a>Logs
+
+The logs are in `rel/wombat/wombat/log`. `debug.log` contains all log messages;
+`wombat.log` contains only error, warning and info messages. These log files can
+be backed up using the `scripts/wombat-debug.sh` script (see
+[WombatOAM debug script](wombat-debug.md) for details).
+
+##<a id='wombatoam_data'></a>WombatOAM data
+
+All data (the list of nodes, node families, collected metrics, etc.) is
+stored in the `rel/wombat/wombat/data/` directory. If you want a fresh start,
+delete this directory. The disk usage information of these data files can be
+collected using the `scripts/wombat-debug.sh` script (see
+[WombatOAM debug script](wombat-debug.md) for details).
+
+##<a id='managing_older_erlang_nodes'></a>Managing older Erlang nodes
+
+The WombatOAM agents module are compiled with an older Erlang/OTP version (R14B04)
+as WombatOAM itself. This way WombatOAM can manage nodes that run R14B04 or newer
+Erlang/OTP.
+
+##<a id='multiple_wombatoam_instances'></a>Multiple WombatOAM instances
+
+You can run multiple WombatOAM instances on the same machine, but you need to
+modify the `wombat.config` files to make sure that different instances use
+different ports and different directories for storing data.
+
+##<a id='gauges'></a>Gauges
+
+If you would like to see graphical gauges showing the current value of a few
+numeric metrics, the metrics need to be specified in the `wombat.config` file.
+You can find a sample configuration in `sys.config`.

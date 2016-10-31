@@ -1,0 +1,99 @@
+---
+title: Authentication and Authorization in WombatOAM
+owner: Erlang Solutions
+---
+
+This topic describes how authentication and authorization work in WombatOAM.
+
+##<a id='authentication'></a>Authentication and Authorization in WombatOAM
+
+WombatOAM ships with built-in user management functionality. This can be disabled
+in the configuration file.
+
+WombatOAM Authentication restricts the usage of the WombatOAM Dashboard, the WombatOAM
+REST interface (including web socket communications) to authenticated users
+only.
+
+WombatOAM Authorization offers the admins to assign roles and rights to users, who
+will access different functionality based on their role and rights.
+
+##<a id='default_user'></a>Default user
+
+By default, there is a single admin user, with the user name `admin` and the
+default password `admin`. (It is strongly advised to change this default
+password at first login.)
+
+##<a id='users_roles_and_rights'></a>Users, roles and rights
+
+Each user has one of the following roles.
+
+- *Admin* role: Only the admin users can manage users, add and remove nodes, and
+  deploy nodes with Orchestration.
+
+- *User* role: All new users are granted the privileges of the *User* role,
+  together with *read* and *write* rights. Each user has a subset of the
+  available rights (*read*, *write* and *execute*). It is possible for a user to
+  have all rights, but not possible to have no right at all. The users can
+  perform different actions depending on which rights they have:
+
+  - The *read* right allows a user to perform read operations that communicate
+    with the plugins on the managed node.
+  - The *write* right allows the user to modify the data inside WombatOAM or affect
+    how WombatOAM collects data from the managed node.
+  - The *execute* right allows the user to run actions that change the manage
+    node's state.
+
+  See more details in the table below.
+
+- *Guest* role: Guest users can examine the data inside WombatOAM, but they cannot
+  perform any action that has any effect on a managed node. E.g. they cannot
+  view live metrics, because when a live metric is enabled, the appropriate
+  plugin running on the managed node will start sending the metric data.
+
+All users can access the WombatOAM dashboard and WombatOAM's REST interface. All users
+can change their passwords via the Dashboard. Usernames and passwords must
+contain only alphanumeric characters. Passwords are stored encrypted.
+
+The following table describes the permissions needed for different actions:
+
+**Action** | **Necessary permission**
+-----------|----------------
+Create bookmarks | Available for all users
+Create front pages | Available for all users
+Change own password | Available for all users
+Change own tags | Available for all users
+View collected metrics | Available for all users
+View notifications | Available for all users
+View alarms | Available for all users
+View service requests | Available for all users
+View live metrics | Read
+Start and stop explorer services | Read
+Acknowledge, clear, command alarms | Write
+Set log level | Write
+Start/stop plugins | Write
+Run custom commands on the node | Execute
+Start and stop executor and configurator services | Execute
+Add and remove nodes and node families | Admin only
+Deploy nodes via WombatOAM Orchestration (beta) |  Admin only
+Adding and deleting users | Admin only
+
+##<a id='changing_a_users_role_and_rights'></a>Changing a user's role and rights
+
+Users can be created and their role and rights altered on the WombatOAM Dashboard
+by clicking on the username and selecting Administration.
+
+The roles and rights can also be changed by modifying the `wombat.config` file
+and then restarting WombatOAM. Each configuration entry will update the user's
+permission in the user database when WombatOAM starts.
+
+The following is an example configuration snippet that assigns permissions to
+several users:
+
+```erlang
+{set, wo_rest, users_permission, <<"guest1">>, guest}.
+{set, wo_rest, users_permission, <<"guest2">>, guest}.
+{set, wo_rest, users_permission, <<"dev_team">>, [read]}.
+{set, wo_rest, users_permission, <<"ops_team">>, [read, write]}.
+{set, wo_rest, users_permission, <<"A_team">>, [read, write, execute]}.
+{set, wo_rest, users_permission, <<"superuser">>, admin}.
+```

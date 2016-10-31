@@ -1,0 +1,844 @@
+---
+title: Alarms
+owner: Erlang Solutions
+---
+
+WombatOAM shows alarms that occur on managed nodes on the web dashboard's
+Alarms tab. A message appears for each alarm, while up to three messages
+at a time also appear as popup windows, showing the latest alarms.
+All messages increment the counter badge on the Alarms tab.
+
+In addition to the built-in alarms (described below), WombatOAM also collects
+alarms entries from the `alarm_handler` module and the `elarm` application,
+if they are present on the managed node.
+
+Tags are assigned to the built-in alarms enabling role based information
+retrieval. Other kind of alarms, such as SASL and elarm alarms, are tagged with
+the `dev` and `op` tags, which can be overridden by adding the following line
+to `wombat.config`.
+
+```erlang
+{set, wo_alarms, default_tags, [<<"Tag1">>, <<"Tag2">>]}.
+```
+
+##<a id='managing_alarm_messages'></a>Managing alarm messages
+
+You can acknowledge, unacknowledge, manually clear, and comment on alarms.
+Most alarms will clear themselves, but can also manually clear those that
+do not.
+
+The controls in the "Manage listed alarms" box lets you select multiple
+alarm messages according to their state, severity, or the node on which
+they occurred, and perform the available actions.
+
+To view and respond to an individual message, click the arrow button on its
+right. This will show details of the alarm. For new messages, you can use
+the buttons under the details to acknowledge or clear the message, or to
+post a comment.
+
+##<a id='builtin_alarms'></a>Built-in alarms
+
+### Node down
+
+* Alarm id: `node_down`.
+* Severity: major.
+* Tags: `dev`, `op`
+
+Occurs when a node is not reachable by WombatOAM.
+This can happen if the node is not running (for example, if it
+crashed or was shut down), but also in case of network partitions.
+In the latter case, you may still be able to access the node from other
+nodes, but not via WombatOAM. You can define the minimum time that needs to
+elapse between the node becoming unreachable and the alarm being raised.
+This may be done to avoid raising alarms with minor, intermittent errors.
+During this time period WombatOAM will keep trying to reconnect to the node.
+If the reconnection succeeds within this period, no alarm will be raised.
+This period is `30` seconds by default. You can redefine it in milliseconds
+by adding the following line to `wombat.config`.
+
+```erlang
+{set, wo_core, node_monitor_max_passive_time, 30000}.
+```
+
+### ETS table count
+
+* Alarm id: `ets_limit_minor`, `ets_limit_major`.
+* Severity: major/minor.
+* Tags: `op`
+
+An upper boundary (70% & 85%) of the emulator's limit has
+been reached.
+
+This alarm is most likely to be raised when the applications running
+on the managed node create ETS tables dynamically. For example, Mnesia
+creates an ETS table for each transaction; if there are many
+transactions running at the same time, it is possible to reach the ETS
+limit.
+
+The ETS limit can be configured by setting the environment variable
+`ERL_MAX_ETS_TABLES` before starting the Erlang runtime system.
+
+### Port count
+
+* Alarm ids: `port_limit_minor`, `port_limit_major`.
+* Severity: major/minor.
+* Tags: `op`
+
+An upper boundary (70% & 85%) of the emulator's limit has
+been reached.
+
+The port limit can be configured at startup by using the following command-line
+flag: `+Q`
+
+### Process count
+
+* Alarm ids: `process_limit_minor`, `process_limit_major`.
+* Severity: major/minor.
+* Tags: `op`
+
+An upper boundary (70% & 85%) of the emulator's limit has
+been reached.
+
+The process limit can be configured at startup by using the following
+command-line flag: `+P`
+
+A bunch of process related metrics are available under the metric category named
+`Processes` by default. For instance, the `Processes` metric shows the number of
+processes currently existing at the selected node whilst the `Orphan processes`
+metric shows the number of only those processes that do not belong to any group
+leader.
+
+### Atom count
+
+* Alarm id: `atom_limit_minor`, `atom_limit_major`.
+* Severity: major/minor.
+* Tags: `dev`, `op`
+
+An upper boundary (70% & 85%) of the emulator's limit has
+been reached.
+
+This alarm is most likely an indication of unsatisfactory code dynamically
+turning strings into atoms. Since the atom table is not garbage-collected,
+the only way to recover from this situation is to restart the node. That can be
+prevented by preferring the `list_to_existing_atom/1` to the `list_to_atom/1`
+function.
+
+The atom limit can be configured at startup by using the following command-line
+flag: `+t`
+
+### Module count
+
+* Alarm ids: `module_limit_minor`, `module_limit_major`.
+* Severity: major/minor.
+* Tags: `dev`, `op`
+
+An upper boundary (70% & 85%) of the emulator's limit has
+been reached.
+
+This alarm is most likely to be raised when new modules that are dynamically
+created by an on-the-fly code generator are not deleted later.
+To recover from this situation, identify the modules that are no longer needed,
+and use `code:soft_purge/1` to erase them from the system.
+Pro tip: use WombatOAM's [Services][services] to get rid of all unnecessary modules.
+
+### Exported function count
+
+* Alarm ids: `export_limit_minor`, `export_limit_major`.
+* Severity: major/minor.
+* Tags: `dev`, `op`
+
+An upper boundary (80% & 90%) of the emulator's limit has
+been reached.
+
+See the description for the very similar [module count alarm][module-count]
+for information on how to recover from this situation.
+
+### Memory used by beam
+
+* Alarm ids: `memory_limit_minor`, `memory_limit_major`.
+* Severity: major/minor.
+* Tags: `dev`, `op`
+
+An upper boundary (70% & 85%) of the system's total
+memory has been used by the Erlang node.
+
+This alarm is only raised when `os_mon` provides total system memory
+statistics.
+To recover, identify the processes that consume the most memory.
+Perhaps, by reviewing their implementations, the memory consumption
+can be improved.
+Pro tip: Use WombatOAM's [ETOP like process listing][etop] to identify the
+processes that consume the most memory.
+
+### Open file count
+
+* Alarm ids: `open_file_limit_minor`, `open_file_limit_major`.
+* Severity: major/minor.
+* Tags: `op`
+
+An upper boundary (70% & 85%) of the OS's limit has been
+reached.
+
+This alarm does not necessarily mean the Erlang node is misbehaving;
+any other OS process on the host may also be responsible.
+
+There is a built-in metric called `Open x ports` that shows the number of open
+ports belonging to specific types. By default, only ports with type TCP/UDP/SCTP
+are displayed, nonetheless, the metric can be configured to provide a much more
+detailed view. See the "[builtin_metrics plugin][builtin_metrics_plugin]" for
+more information.
+
+This alarm is only raised on Linux and Solaris.
+
+### Open socket count
+
+* Alarm ids: `open_socket_limit_minor`, `open_socket_limit_major`.
+* Severity: major/minor.
+* Tags: `op`
+
+An upper boundary (70% & 85%) of the OS limit has been
+reached by all the processes on the current host.
+
+There is a built-in metric category called `Ports and sockets` aiding the
+investigation of the problem in more details. It includes metrics such as
+The `Open TCP sockets`, `Open UDP sockets`, and `Open SCTP sockets`.
+
+
+This alarm is only raised on Linux, Solaris and OS X.
+
+On Linux, the plugin attempts to call the `ss` utility (`ss -s`). If it fails,
+it will attempt to read `/proc/net/sockstat[6]` directly. If that fails too, a
+call to `netstat -an` will be used. A value from `sysctl -n fs.file-max` is used
+as system limit. If `netstat` fails, 0 will be returned.
+
+On OS X, a call to `sysctl -n` will be used, summing up values for
+`net.inet.tcp.cubic_sockets`, `net.inet.tcp.background_sockets` and
+`net.inet.tcp.newreno_sockets`. A value from `sysctl -n kern.maxfiles` is used
+as system limit. If sysctl call fails, attempt to call `netstat -an` will be
+performed, else 0 will be returned.
+
+On Solaris, a call to `netstat -an` is used. A value from `sysctl -n
+fs.file-max` is used as system limit. If `netstat` fails, 0 will be returned.
+
+### Open file descriptors limits
+
+* Alarm id: `open_fd_limit_user_minor`, `open_fd_limit_user_major` and
+  `open_fd_limit_node_minor`, `open_fd_limit_node_major`.
+* Severity: major/minor.
+* Tags: `op`
+
+An upper boundary (75% & 90%) of user/node open file
+descriptors limit has been reached by the Erlang process.
+
+These alarms are raised on Linux, OS X and Solaris.
+
+File descriptor alarms include both sockets and files, as they are sharing same
+(file descriptor or Erlang ports) resource.
+
+User alarm counts fd's opened by current user against ulimit -n.
+Node alarm counts ports open in current Erlang node against node limits.
+Ports are used for both files and sockets in Erlang.
+
+### Disk capacity
+
+* Alarm ids: `disk_capacity_minor`, `disk_capacity_major`.
+* Severity: major/minor.
+* Tags: `op`
+
+An upper boundary (70% & 85%) of the disk capacity has
+been reached on any of the disks on the host.
+
+The `Disk capacity on x` is a built-in metric, which may be useful to manage the
+issue. It shows the percentage of disk space occupied on the mounted partition
+named `x`.
+
+This alarm does not necessarily mean the Erlang node is misbehaving,
+any other OS process on the host may also be responsible.
+
+This alarm is only raised when `os_mon` provides disk usage statistics.
+
+### Max message queue length
+
+* Alarm ids: `process_message_queue_minor`, `process_message_queue_major`.
+* Severity: major/minor.
+* Tags: `dev`, `op`
+
+An upper boundary (5,000 & 20,000 messages) of the
+message queue length of a single Erlang process has been reached. Long message
+queues are often a symptom of a bottleneck and result in the degradation of
+throughput, with the system eventually running out of memory.
+
+If it occurs frequently, you should improve your code to remove the bottleneck.
+Pro tip: Use WombatOAM's [ETOP like process listing][etop] to identify the
+processes with the largest message queue.
+
+### CPU load
+
+* Alarm ids: `os_cpu_load_minor`, `os_cpu_load_major`.
+* Severity: major/minor.
+* Tags: `op`
+
+An upper boundary (70% & 85%) of the CPU utilisation has
+been reached.
+
+This alarm does not necessarily mean the Erlang node is misbehaving,
+any other OS process on the host may also be responsible.
+
+This alarm is only raised when `os_mon` provides CPU usage statistics.
+
+### Shell history size
+
+* Alarm ids: `shell_history_size_minor`, `shell_history_size_major`.
+* Severity: major/minor.
+* Tags: `op`
+
+An upper boundary (20 MB & 100 MB) of the cumulative
+shell history size of all shell processes has been reached. Large shell sizes
+have been known to cause the node to run out of memory and crash.
+
+To recover from this situation, use one of the following options:
+
+* Terminate unnecessary shell processes. To do this, press `Ctrl+G` and then
+  use the `k` command.
+
+* Reduce the shell history size to the `N` most recent commands. To do this,
+  execute `history(N)` in the shells you want to keep (for example, the
+  `{shell,start,[init]}` job).
+
+* Remove unnecessary variable bindings. Use the `f(X)` and `f()`
+  shell commands.
+
+### Invalid application version
+
+* Alarm id: `invalid_application_version`.
+* Severity: major.
+* Tags: `dev`, `op`
+
+The indicated applications have an older application version
+than required by the OTP release.
+
+This alarm is only likely to be raised on a node running a custom
+release composed of OTP applications from different OTP releases.
+You can find more information under Topology.
+
+### Invalid app file
+
+* Alarm id: `invalid_app_file`.
+* Additional info: Name of the applications with missing application files.
+* Severity: major.
+* Tags: `dev`, `op`
+
+The indicated applications have an invalid `.app` file.
+
+While this alarm may be raised frequently, it is sometimes safe to ignore.
+A typical problem is when an application's version number does not follow the
+common dot-separated integer format (for example, `0.5.3`), but contains a
+commit ID or similar piece of information (such as `0.5.3-163-gfecbad3`).
+Such an application can be perfectly loaded and used, but will fail to pass
+this sanity check and accordingly raise an alarm.
+
+### Missing runtime dependencies
+
+* Alarm id: `missing_runtime_dependencies`.
+* Additional info: Names of the missing dependencies.
+* Severity: major.
+* Tags: `op`
+
+The indicated applications require runtime dependencies
+(applications that are loaded but not necessarily started) that are
+not available.
+
+This alarm should be raised on systems that are running an incorrectly
+built OTP release. However, declaring run time dependencies was
+introduced in OTP 17 and the documentation states that these
+specifications are not yet entirely correct, so false positives
+reported by this sanity check are possible.
+
+### Old code
+
+* Alarm id: `old_code`.
+* Severity: minor.
+* Tags: `op`
+
+The indicated modules has old code loaded on the node.
+
+This alarm indicates that a process or a user (via a shell) loaded a new
+version of a module on the node. This is normal during a hot code upgrade
+or on a development node that is configured to recompile modules when
+sources are changed, but in a production environment it is likely to
+indicate a problem in configuration management and change control.
+
+To recover from this condition, erase the old version of the module's
+code by calling the following: `code:purge/1`
+
+### Module clash
+
+* Alarm id: `module_clash`.
+* Severity: major.
+* Tags: `dev`
+
+The indicated modules have multiple versions in separate
+directories. This means a name clash in module names.
+
+Properly built OTP releases shouldn't have code clashes, because the
+release is checked for such errors at build time. This alarm is likely
+to be raised on systems where the code path is manipulated at runtime.
+
+### Different module versions
+
+* Alarm id: `different_module_versions`.
+* Additional info: Info about the name of the module and the module versions
+  used by the listed nodes belonging to the same node family.
+* For configuration possibilities refer to [Configuration][config] section.
+* Severity: warning.
+* Tags: `op`
+
+Different nodes in the same node family have different
+versions of the indicated module loaded.
+
+This alarm indicates a configuration management issue in the cluster.
+To recover, ensure all nodes have the same module version in a node family.
+
+### Missing module
+
+* Alarm id: `missing_module`.
+* Additional info: Info about the name of the module which is not loaded into
+  some nodes belonging to the same node family.
+* For configuration possibilities refer to [Configuration][config] section.
+* Severity: warning.
+* Tags: `op`
+
+A module is not loaded in all nodes belonging to the node
+family.
+
+This alarm indicates a configuration management issue in the cluster.
+To recover, ensure the module is loaded in all nodes in a node family.
+
+### Different application versions
+
+* Alarm id: `different_application_versions`.
+* Additional info: Info representing the name of the application and the
+  application versions running on the listed nodes of that node family.
+* For configuration possibilities refer to [Configuration][config] section.
+* Severity: warning.
+* Tags: `op`
+
+Different versions of the indicated application are currently
+running on nodes in the same node family.
+
+This alarm indicates a configuration management issue in the cluster.
+To recover, ensure all nodes have the same application version in a node family.
+
+### Missing application
+
+* Alarm id: `missing_application`.
+* Additional info: Info about the name of the application which is currently not
+  running on some nodes belonging to the same node family.
+* For configuration possibilities refer to [Configuration][config] section.
+* Severity: warning.
+* Tags: `op`
+
+The indicated application is currently not running on all
+nodes in the node family.
+
+This alarm indicates a configuration management issue in the cluster.
+To recover, ensure the same applications are running on all nodes in a node family.
+
+### Different timezones
+
+* Alarm id: `different_timezones`.
+* Additional info: Info about the name of the node family, and the timezones
+  with the node names.
+* For configuration possibilities refer to [Configuration][config] section.
+* Severity: warning.
+* Tags: `op`
+
+Nodes in the same node family have different timezone settings.
+
+To recover from this situation, synchronize the timezone settings in
+the OS of the hosts in the cluster.
+
+### Missing global config
+
+* Alarm id: `global_config_missing`.
+* Additional info: Info about the missing global config.
+* Severity: major.
+* Tags: `op`
+
+The indicated global config is currently not set on all
+nodes in the node family. Perhaps, the process of changing global configurations
+was aborted or a node with old configuration has joined the cluster.
+
+This alarm indicates a configuration management issue in the cluster.
+To recover, ensure that all the global configs share the same values on all
+nodes in a node family.
+Pro tip: use WombatOAM's [Configuration management][configmngmnt] feature.
+
+### Different global configs
+
+* Alarm id: `inconsistent_global_config`.
+* Additional info: Info about the inconsistent global config, the name of the
+  node family, and the different values with the node names.
+* Severity: major.
+* Tags: `op`
+
+The indicated global config is inconsistent. It has different
+values set on nodes in the node family. Perhaps, the process of changing global
+configurations didn't succeed on all nodes, or the value was changed locally on
+some nodes.
+
+This alarm indicates a configuration management issue in the cluster.
+To recover, ensure that all the global configs share the same values on all
+nodes in a node family.
+Pro tip: use WombatOAM's [Configuration management][configmngmnt] feature.
+
+### Disk almost full
+
+* Alarm id: {`disk_almost_full`, Mount}.
+* Severity: minor.
+* Tags: `op`
+
+A lower boundary of free space on the indicated disk
+has been reached.
+
+This alarm is only raised when `os_mon` provides disk usage
+statistics. The threshold also depends on the `os_mon` settings.
+
+### System memory high watermark
+
+* Alarm id: `system_memory_high_watermark`.
+* Severity: major.
+* Tags: `op`
+
+An upper boundary of total memory usage of all OS processes has
+been reached.
+
+This alarm is only raised when `os_mon` provides memory usage
+statistics. The threshold also depends on the `os_mon` settings.
+
+### Process memory high watermark
+
+* Alarm id: `process_memory_high_watermark`.
+* Additional info: Pid of the process.
+* Severity: major.
+* Tags: `dev`, `op`
+
+An upper boundary of memory usage of the indicated Erlang
+process has been reached.
+
+This alarm is only raised when `os_mon` provides memory usage
+statistics. The threshold also depends on the `os_mon` settings.
+
+### Riak Node down
+
+* Alarm id: `{riak_core_nodedown, Node}`.
+* Severity: major.
+* Tags: `op`
+
+Occurs when a Riak node is not reachable by WombatOAM.
+This can happen if the node is not running (for example, if it
+crashed or was shut down), but also in case of network partitions.
+In the latter case, you may still be able to access the node from other
+nodes, but not via WombatOAM.
+
+It is recommended to take a look at Riak and other log files, find and fix the
+cause.
+
+### Mnesia inconsistent
+
+* Alarm id: `mnesia_inconsistent`.
+* Severity: major.
+* Tags: `dev`, `op`
+
+This alarm means the database across the cluster is inconsistent.
+Perhaps, there was a power failure, a temporary network issue or a table
+was force loaded to some nodes.
+
+To recover, it needs to be resolved manually. The most basic solution is to
+restore the database from a backup.
+
+### Mnesia overload
+
+* Alarm id: `mnesia_overload`.
+* Severity: major.
+* Tags: `dev`, `op`
+
+Mnesia is currently overloaded, this can be caused by frequent or voluminous
+updates. This is usually a transient condition and the alarm is cleared
+automatically by WombatOAM.
+
+If it occurs frequently, you should review the design of your code to decrease
+the use (notably write operations) of Mnesia.
+
+### Poolboy
+
+* Alarm Id: `{poolboy, POOL}`
+* Severity: major.
+* Tags: `dev`, `op`
+
+An alarm is raised when a pool becomes `full`: all workers are used and no more
+workers can be launched.
+This can happen when the system is under heavy load that is much larger than
+expected or the workers of the pool are handled incorrectly. Pool workers may
+need more time to process or too few workers launched.
+
+If the alarm is often raised you may refine the pools' configurations, for
+instance, consider to increase the pool sizes; or balance the load to other
+nodes if system resources are scarce.
+
+### SASL alarms
+
+* Alarm id: As specified when raising an alarm using `alarm_handler`.
+* Severity: indeterminate.
+* Tags: `dev`, `op`
+
+Any alarm reported to the SASL `alarm_handler` will be
+reported by WombatOAM.
+
+### Elarm alarms
+
+* Alarm id: As specified when calling elarm:raise.
+* Severity: indeterminate.
+* Tags: `dev`, `op`
+
+Any alarm reported to the [Elarm][] Alarm Manager will
+be reported by WombatOAM.
+
+[Elarm]: https://github.com/esl/elarm
+
+##<a id='threshold_based_alarms'></a>Threshold based alarms
+
+In the majority of cases good system behaviour can be described with good metric
+values within a range. WombatOAM can raise alarms based on a given metric crossing
+a given threshold indicating the need for human intervention.
+
+Notes:
+
+* All threshold based alarms from a node are cleared when the node goes down for
+  some reason.
+* Counters and gauges are supported (spirals, meters and histograms are not).
+
+### Configuring threshold based alarms
+
+Thresholds can be configured in `wombat.config` with the `threshold_sets` and
+`threshold_templates` entries within the `wo_metrics` application. A Threshold
+Set specifies a list of rules (basically each rule is a threshold for a metric)
+applicable for a list of nodes and node families. They can have the following
+fields:
+
+- **`nodes`** (default `[]`): list of node display names as strings as seen on
+  the Dashboard for which the given rules apply.
+- **`node_families`** (default `[]`): list of node family display names as
+  strings as seen on the Dashboard for which the given rules apply.
+- **`rules`** (mandatory): list of Threshold Rules, each of which can have the
+  following fields:
+  - **`name`**: alarm id to be raised.
+  - **`metric`** {"Category", "Metric"}: the metric category and name as seen on
+    the Dashboard on the left side bar. Example categories: "Memory", "Exometer
+    metrics". (Note that metrics belonging to Exometer and Folsom categories
+    have an extra "exometer" or "folsom" prefix in their names when published on
+    the REST API and in other OAM tools such as Graphite but here the shorter
+    Dashboard format must be used.)
+  - **`direction`** (`warn_above` or `warn_below`): should the alarm be raised
+    above or below `raise_level`.
+  - **`raise_level`** (number): crossing the raise level in the given direction
+    will trigger the alarm.
+  - **`cease_level`** (number): crossing the cease level in the opposite
+    direction will clear the alarm. Setting a different value than raise level
+    will prevent triggering a lot of alarms when the metric value is oscillating
+    around raise level. Cease level must not be higher than raise level if
+    the direction is `warn_above` or lower if the direction is `warn_below`.
+  - **`unit`** (`numeric` or `percentage`): specifies if the levels are absolute
+    values in the unit of the metric or a percentage of the value of percentage
+    base.
+  - **`percentage_base`** (number): must only be given if `unit` is
+    `percentage`. In that case levels mean a percentage of this absolute value
+    which should be given in the unit of the metric.
+  - **`template`** (optional): name of the Threshold Template to take default
+    values from.
+
+A Threshold Rule can reference a Threshold Template which can have the same
+fields (but all are optional). The fields from the two are merged with the
+fields in the Threshold Rule overwriting the same field value from the Threshold
+Template. A Threshold Template cannot reference another Threshold Template. The
+`threshold_templates` entry should be a list of two-tuples where the first
+element is the name of the template, the second is a key-value list.
+
+Example:
+
+The following example configuration raises an alarm with `test_processmem_alarm`
+id when the "Memory/Process memory" metric goes above 400 (which is 80% of the
+500 percentage base value) on nodes `test1` and `test2`. When the metric goes
+below 300 (which is 60% of the base value), then the alarm is cleared.
+`test_totalmem_alarm` and `prod_processmem_alarm` are similar alarms so
+we used a template for the general settings of an above-80% alarm. As the
+available memory is different in the test and production environment we set
+different, appropriate values as `percentage_base` for the two groups of
+nodes. A `msg_queue_alarm` is also produced if the sum of the length of the
+message queues on any node goes above 300.
+
+```erlang
+{set, wo_metrics, threshold_templates,
+ [{warn_above_80_percent,
+   [{raise_level, 80},
+    {cease_level, 60},
+    {unit, percentage},
+    {direction, warn_above}]}]}.
+
+{set, wo_metrics, threshold_sets,
+ [
+  [{nodes, ["test1", "test2"]},
+   {rules,
+    [[{name, "test_processmem_alarm"},
+      {metric, {"Memory", "Process memory"}},
+      {template, warn_above_80_percent},
+      {percentage_base, 500}],
+     [{name, "test_totalmem_alarm"},
+      {metric, {"Memory", "Total memory"}},
+      {template, warn_above_80_percent},
+      {percentage_base, 700}]]}],
+  [{node_families, ["prod_location1", "prod_location2"]},
+   {rules,
+    [[{name, "prod_processmem_alarm"},
+      {metric, {"Memory", "Process memory"}},
+      {template, warn_above_80_percent},
+      {percentage_base, 1000}]]}],
+  [{nodes, all},
+   {rules,
+    [[{name, "msg_queue_alarm"},
+      {metric, {"Processes","Sum message queue length"}},
+      {raise_level, 300},
+      {cease_level, 250},
+      {unit, numeric},
+      {direction, warn_above}]]}]
+ ]}.
+```
+
+As another example, let's configure an Exometer metric. Let's assume that the
+Exometer metric is displayed as `[<<"localhost">>,session_count]` on the
+Dashboard, and that you can query by calling
+`exometer:get_value([<<"localhost">>, session_count])` on the node. The
+following rule will raise an alarm if the value of the metric is more than 1000:
+
+```erlang
+{set, wo_metrics, threshold_sets,
+ [
+  [{nodes, all},
+   {rules,
+    [[{name, "too_many_sessions_alarm"},
+      {metric, {"Exometer metrics", "[<<\"localhost\">>,session_count]"}},
+      {raise_level, 1000},
+      {cease_level, 500},
+      {unit, numeric},
+      {direction, warn_above}]]}]
+ ]}.
+```
+
+##<a id='notification_based_alarms'></a>Notification based alarms
+
+WombatOAM can be configured to monitor notifications. If a new notification matches
+the user defined criteria then WombatOAM will raise an alarm for the node that the
+log entry has been collected from.
+
+### Configuring notification based alarms
+
+Criteria for an alarm can be defined as a rule. The list of rules can be
+configured in `wombat.config` with the `log_alarms` entry within the `wo_alarms`
+application. Each rule have the following fields:
+
+- **`message_pattern`**: Each notification's message will match against this
+  regular expression. Note that a dot in the pattern matches all characters,
+  including those indicating newline.
+- **`match_tags`**: You can further filter notifications by tags. It can be the
+  `all` atom, or a list of tags in binary format. You can read more about it in
+  the [Tags][tags] section.
+- **`alarm_properties`**: List of properties that the alarm will have.
+  - **`alarm_id`**: Alarm id to be raised in atom format.
+  - **`severity`**: Severity as an atom.
+  - **`alarm_tags`**: List of binary tags.
+  - **`probable_cause`**: Describes the alarm's probable cause in binary format.
+  - **`proposed_repair_action`**: Proposed repair action in binary format.
+
+Example:
+
+The following example configuration contains one rule to raise an alarm with
+`custom_app_alarm` id when a notification arrives that is tagged with
+`<<"dev">>` and the message contains the `custom_app_alarm` text:
+
+```erlang
+{set, wo_alarms, log_alarms,
+ [[{alarm_properties,
+   [{alarm_id, custom_app_alarm},
+    {severity, error},
+    {alarm_tags, [<<"dev">>]},
+    {probable_cause, <<"">>},
+    {probable_repair_action, <<"">>}]},
+   {match_tags, [<<"dev">>]},
+   {message_pattern, <<"custom_app_alarm">>}],
+  [{alarm_properties,
+   [{alarm_id, new_app_alarm},
+    {severity, warning},
+    {alarm_tags, [<<"op">>]}]},
+   {match_tags, [<<"dev">>, <<"op">>]},
+   {message_pattern, <<"unwanted result">>}
+  ]
+ ]}.
+```
+
+##<a id='email_alarm_notifications'></a>Email alarm notifications
+
+WombatOAM can send notifications of alarms that are raised on the monitored nodes
+via email. You can be notified of all alarms, or specify the alarms for which
+you want to receive notifications.
+
+### Configuring email alarm notifications
+
+Alarm notification emails are configured in the `elarm` and `elarm_mailer`
+entries in the `sys.config` file. Overriding these in the `wombat.config` file
+is recommended. Edit the fields to match your system, and restart WombatOAM to load
+the new configuration. The following example configuration uses Gmail as a relay
+for outbound emails.
+
+```erlang
+%% Elarm mailer config
+{set, elarm_mailer, sender, "wombat@gmail.com"}.
+
+{set, elarm_mailer, recipients, ["alarms@example.com"]}.
+
+{set, elarm_mailer, gen_smtp_options,
+ [{relay, "smtp.gmail.com"},
+  {username, "wombat@gmail.com"},
+  {password, "password"},
+  {port, 25}]}.
+
+{set, elarm_mailer, subscribed_alarms,
+ [system_memory_high_watermark,
+  disk_capacity_minor,
+  process_message_queue_major,
+  node_down]}.
+```
+
+The following fields need to be edited:
+
+- **`elarm_mailer`**
+    - **`sender`**: The email address from which alarm notifications will be sent.
+    - **`recipients`**: A list of the email addresses to which the alarm
+      notifications should be sent.
+    - **`gen_smtp_options`**
+        - **`relay`**: The server via which emails should be sent. For example,
+          "smtp.gmail.com", or "localhost" if you have a local SMTP server.
+        - **`username`**: The username of the account used for sending emails.
+        - **`password`**: The password of the account used for sending emails.
+        - **`port`**: The SMTP port on the machine from which emails will be sent.
+    - **`subscribed alarms`**: The alarms IDs of the alarms for which emails should
+    be sent. For example: `system_memory_high_watermark`, `disk_capacity_minor`,
+    `process_message_queue_major`, `node_down`. WombatOAM will _not_ send email
+    notifications for alarms that are not in this list.
+
+[module-count]: #module-count
+[config]: configuration.md
+[configmngmnt]: services.md#configurator
+[services]: services.md
+[etop]: services.md#etop
+[builtin_metrics_plugin]: plugins/builtin_metrics_plugin.md
+[tags]: tags.md
