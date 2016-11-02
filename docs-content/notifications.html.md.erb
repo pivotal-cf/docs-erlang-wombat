@@ -46,7 +46,7 @@ the possibility to send abridged emails that contain the last `n`
 notifications.
 
 The details on how to configure this mailer feature can be found in the
-"[Configuration][configuration]" section.
+"[Configuration](./configuration.html)" section.
 
 ##<a id='builtin_notifications'></a>Built-in notifications
 
@@ -54,7 +54,7 @@ The details on how to configure this mailer feature can be found in the
 
 Triggered by a system monitor on busy ports. A process in the system was
 suspended because it was sending to a busy port. This notification is disabled
-by default, see the documentation of the [`code_tracer`][codetracer] plugin on
+by default, see the documentation of the [`code_tracer`](./index.html) plugin on
 how to enable it.
 
 ### Busy dist port
@@ -62,14 +62,14 @@ how to enable it.
 Triggered by a system monitor on busy dist ports. A process in the system was
 suspended because it was sending to a process on a remote node whose inter-node
 communication was handled by a busy port. This notification is disabled by
-default, see the documentation of the [`code_tracer`][codetracer] plugin on how
+default, see the documentation of the [`code_tracer`](./index.html) plugin on how
 to enable it.
 
 ### Long GC
 
 Triggered by a system monitor by an unusually long garbage collection. A garbage
 collection in the system took longer than expected. This notification is
-disabled by default, see the documentation of the [`code_tracer`][codetracer]
+disabled by default, see the documentation of the [`code_tracer`](./index.html)
 plugin on how to enable it.
 
 ### Long schedule
@@ -77,14 +77,14 @@ plugin on how to enable it.
 Triggered by a system monitor as a result of a process hogging the scheduler. A
 process or port in the system has been running uninterrupted for a longer time
 than expected. This notification is disabled by default, see the documentation
-of the [`code_tracer`][codetracer] plugin on how to enable it.
+of the [`code_tracer`](./index.html) plugin on how to enable it.
 
 ### Large heap
 
 Triggered by a system monitor due to an unusually large heap. A garbage
 collection in the system resulted in the size of a heap being unusually large.
 This notification is disabled by default, see the documentation of the
-[`code_tracer`][codetracer] plugin on how to enable it.
+[`code_tracer`](./index.html) plugin on how to enable it.
 
 ### Crash dump saved
 
@@ -127,9 +127,6 @@ Indicates a change in the number of online schedulers.
 ### Scheduler wakes up
 
 Indicates a change in the number of online schedulers.
-
-[configuration]: configuration.md#configuration-reference
-[codetracer]: plugins/code_tracer_plugin.md
 
 ##<a id='configuring_logging'></a>Configuring logging
 

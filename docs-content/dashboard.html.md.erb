@@ -39,13 +39,13 @@ for individual nodes. Different metrics can be combined on the same graph.
   select a metric. A new data point in the total memory graph arrives every 60
   seconds (configurable). If you select a node family, the metrics of the nodes
   are stacked onto each other.
-- WombatOAM has 90 built-in metrics; it also collects [folsom][folsom]
-  and [exometer][exometer] metrics
+- WombatOAM has 90 built-in metrics; it also collects [folsom](https://github.com/boundary/folsom)
+  and [exometer](https://github.com/Feuerlabs/exometer) metrics
   created on the node, as well as metrics from custom plugins,
   allowing you to combine business and system metrics.
 - WombatOAM can push the metrics to other OAM tools. This means that you can
   integrate WombatOAM metrics with other metrics that aren't Erlang-related.
-  See the "[Integration with third-party tools][integration]" section.
+  See the "[Integration with third-party tools](./rabbitmq_plugin.html)" section.
 
 <!--
 - Superimpose metrics: Click the "pin" icon above the graph so that it is
@@ -101,7 +101,3 @@ their own pages with the following constraints:
 - If authentication is switched off, users have the same rights as admins when
   authentication is on.
 
-[exometer]: https://github.com/Feuerlabs/exometer
-[folsom]: https://github.com/boundary/folsom
-[graphite]: http://graphite.readthedocs.org/en/latest/
-[integration]: integration.md

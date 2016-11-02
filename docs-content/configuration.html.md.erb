@@ -173,7 +173,7 @@ to `false`.
 {set, wo_rest, default_user_tags, all}.
 ```
 
-In order to change the [tags][tagsdoc] that new users will be created with or
+In order to change the [tags](./reference.html) that new users will be created with or
 the tags that are used by the REST layer when the authentication is switched
 off, change the value of `default_user_tags` to either `all` or a list of tags
 represented as binary strings. If `all` is set, all information available in
@@ -284,13 +284,9 @@ the `kernel` Erlang application:
 ```
 
 This modification needs to be performed on the managed nodes. In most Erlang
-applications, it can be set in the [`sys.config` file][sys_config]. In case of
-Riak 1.x nodes, [this setting can be set in the `app.config` file][riak1]. In
-case of Riak 2.x nodes, [it can be set in `riak.conf`][riak2].
-
-[sys_config]: http://erlang.org/doc/man/config.html
-[riak1]: http://docs.basho.com/riak/1.4.12/ops/advanced/security/
-[riak2]: http://docs.basho.com/riak/2.1.1/ops/advanced/security/#Inter-node-Communication
+applications, it can be set in the [`sys.config` file](http://erlang.org/doc/man/config.html). In case of
+Riak 1.x nodes, [this setting can be set in the `app.config` file](http://docs.basho.com/riak/1.4.12/ops/advanced/security/). In
+case of Riak 2.x nodes, [it can be set in `riak.conf`](http://docs.basho.com/riak/2.1.1/ops/advanced/security/#Inter-node-Communication).
 
 ## <a id='configuring_apache'></a>Configuring Apache
 
@@ -434,7 +430,7 @@ Deletes the given configuration entry.
      [{"riak.*", {0, 10}}]}]}]}.
 ```
 
-- `wo_metrics/graphite`: Configures the connection to [Graphite][graphite]. If
+- `wo_metrics/graphite`: Configures the connection to [Graphite](http://graphite.readthedocs.org/en/latest/). If
   not configured, WombatOAM will not push metrics to Graphite.
 
   Example:
@@ -445,7 +441,7 @@ Deletes the given configuration entry.
   {carbon_udp_port, 2003}]}.
 ```
 
-- `wo_metrics/datadog`: Configures the connection to [Datadog][datadog]. If
+- `wo_metrics/datadog`: Configures the connection to [Datadog](https://www.datadoghq.com/). If
   not configured, WombatOAM will not push metrics to Datadog.
 
   Example:
@@ -654,7 +650,7 @@ Deletes the given configuration entry.
   Example: `error`
 
 - `wo_logs/gen_smtp_options`: The configuration values for the SMTP client
-  used, [gen_smtp][].
+  used, [gen_smtp](https://github.com/Vagabond/gen_smtp).
 
  Example:
 
@@ -667,7 +663,7 @@ Deletes the given configuration entry.
 ```
 
 - `wo_logs/graylog`: The configuration values for Graylog log management tool,
-  [graylog][].
+  [graylog](https://www.graylog.org/).
 
  Example:
 
@@ -684,8 +680,3 @@ Deletes the given configuration entry.
    ]}.
 ```
 
-[graphite]: http://graphite.readthedocs.org/en/latest/
-[datadog]: https://www.datadoghq.com/
-[gen_smtp]: https://github.com/Vagabond/gen_smtp
-[graylog]: https://www.graylog.org/
-[tagsdoc]: tags.md
