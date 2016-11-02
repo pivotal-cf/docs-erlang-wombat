@@ -1,5 +1,5 @@
 ---
-title: WombatOAM Reference
+title: WombatOAM reference
 owner: Erlang Solutions
 ---
 
@@ -8,7 +8,7 @@ owner: Erlang Solutions
 The logs are in `rel/wombat/wombat/log`. `debug.log` contains all log messages;
 `wombat.log` contains only error, warning and info messages. These log files can
 be backed up using the `scripts/wombat-debug.sh` script (see
-[WombatOAM debug script](http://www.erlang-solutions.com/products/wombat-oam.html) for details).
+[WombatOAM debug script](wombat-debug.md) for details).
 
 ##<a id='wombatoam_data'></a>WombatOAM data
 
@@ -16,9 +16,9 @@ All data (the list of nodes, node families, collected metrics, etc.) is
 stored in the `rel/wombat/wombat/data/` directory. If you want a fresh start,
 delete this directory. The disk usage information of these data files can be
 collected using the `scripts/wombat-debug.sh` script (see
-[WombatOAM debug script](http://www.erlang-solutions.com/products/wombat-oam.html) for details).
+[WombatOAM debug script](wombat-debug.md) for details).
 
-##<a id='managing_older_erlang_nodes'></a>Managing Older Erlang nodes
+##<a id='managing_older_erlang_nodes'></a>Managing older Erlang nodes
 
 The WombatOAM agents module are compiled with an older Erlang/OTP version (R14B04)
 as WombatOAM itself. This way WombatOAM can manage nodes that run R14B04 or newer
