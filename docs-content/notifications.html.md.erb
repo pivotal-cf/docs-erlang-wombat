@@ -53,38 +53,29 @@ The details on how to configure this mailer feature can be found in the
 ### Busy port
 
 Triggered by a system monitor on busy ports. A process in the system was
-suspended because it was sending to a busy port. This notification is disabled
-by default, see the documentation of the [`code_tracer`](./index.html) plugin on
-how to enable it.
+suspended because it was sending to a busy port.
 
 ### Busy dist port
 
 Triggered by a system monitor on busy dist ports. A process in the system was
 suspended because it was sending to a process on a remote node whose inter-node
-communication was handled by a busy port. This notification is disabled by
-default, see the documentation of the [`code_tracer`](./index.html) plugin on how
-to enable it.
+communication was handled by a busy port.
 
 ### Long GC
 
 Triggered by a system monitor by an unusually long garbage collection. A garbage
-collection in the system took longer than expected. This notification is
-disabled by default, see the documentation of the [`code_tracer`](./index.html)
-plugin on how to enable it.
+collection in the system took longer than expected.
 
 ### Long schedule
 
 Triggered by a system monitor as a result of a process hogging the scheduler. A
 process or port in the system has been running uninterrupted for a longer time
-than expected. This notification is disabled by default, see the documentation
-of the [`code_tracer`](./index.html) plugin on how to enable it.
+than expected.
 
 ### Large heap
 
 Triggered by a system monitor due to an unusually large heap. A garbage
 collection in the system resulted in the size of a heap being unusually large.
-This notification is disabled by default, see the documentation of the
-[`code_tracer`](./index.html) plugin on how to enable it.
 
 ### Crash dump saved
 
