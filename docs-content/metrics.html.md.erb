@@ -7,9 +7,12 @@ WombatOAM has more than 100 built-in metrics, organised into metric categories
 on the dashboard (such categories are Memory, Runtime, I/O, etc.) See the
 description of all built-in metrics below.
 
-WombatOAM also collects metrics from the [folsom](https://github.com/boundary/folsom) and [exometer](https://github.com/Feuerlabs/exometer) applications
+WombatOAM also collects metrics from the [folsom][] and [exometer][] applications
 if they are running on the managed node. These are shown under the "folsom" and
 "exometer" metric categories on the dashboard.
+
+[folsom]: https://github.com/boundary/folsom
+[exometer]: https://github.com/Feuerlabs/exometer
 
 ##<a id='viewing_metrics'></a>Viewing metrics
 
@@ -44,7 +47,7 @@ Other viewing options:
 By default, each metric is polled once a minute, i.e. the metric graphs will
 show a new data point once a minute. If you would like to change this setting,
 please refer to the Configuration reference in the
-"[Configuration](./configuration.html)" section.
+"[Configuration][]" section.
 
 ##<a id='builtin_metrics'></a>Built-in metrics
 
@@ -377,8 +380,7 @@ The amount of allocated memory for this area in bytes.
 
 ###<a id='mnesia_system_metrics'></a>Mnesia System metrics
 
-These metrics are collected by the mnesia plugin. For more information, see the
-"[mnesia plugin](http://www.erlang.org/doc/man/mnesia.html#system_info-1)" section.
+These metrics are collected by the mnesia plugin.
 
 #### checkpoints
 
@@ -566,10 +568,13 @@ emulator thread will execute code in the driver at a time. (As opposed to port
 level locking where each instance of the same port driver will use a
 per-instance lock and multiple emulator threads may execute code in the driver
 at the same time.)  It might indicate a bottleneck if such a driver has many
-instances. (See [erlang:port_info/2](http://erlang.org/doc/man/erlang.html#port_info-2) and the
-`ERL_DRV_FLAG_USE_PORT_LOCKING` [driver flag](http://erlang.org/doc/man/driver_entry.html#driver_flags).) This metric
+instances. (See [erlang:port_info/2][PortInfoLocking] and the
+`ERL_DRV_FLAG_USE_PORT_LOCKING` [driver flag][DriverFlagLocking].) This metric
 is always zero on VMs with SMP support disabled.
 * Tags: `dev`
+
+[PortInfoLocking]: http://erlang.org/doc/man/erlang.html#port_info-2
+[DriverFlagLocking]: http://erlang.org/doc/man/driver_entry.html#driver_flags
 
 #### Alive ports total input in bytes
 
@@ -606,8 +611,7 @@ from `erlang:port_info/1` using the `name` key of the proplist.
 
 By default, only ports with type TCP/UDP/SCTP are displayed. The
 `port_type_counters_mode` option can be used to configure WombatOAM to show all
-ports, including ports opened by a running application. See the
-"[builtin_metrics plugin](http://www.erlang.org/doc/man/erlang.html#port_info-2)" for more information.
+ports, including ports opened by a running application.
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#port_info-2 -->
 
@@ -767,7 +771,7 @@ The number of processes where the status of the process is `waiting`
 #### Processes in suspended state
 
 The number of processes where the status of the process is `suspended`
-(suspended on a "busy" port or by the `erlang:suspend_process/(http://www.erlang.org/doc/man/erlang.html#process_info-2)`
+(suspended on a "busy" port or by the `erlang:suspend_process/[1,2]`
 built-in function).
 * Tags: `dev`
 
@@ -841,7 +845,7 @@ The total number of reductions executed by all processes.
 #### Reductions since last call
 
 The number of reductions that happened since the last call of
-`erlang:statistics/1`. For more details, see [statistics](http://www.erlang.org/doc/man/erlang.html#statistics-1) on the
+`erlang:statistics/1`. For more details, see [statistics][statistics] on the
 `erlang` module's manual page in the Erlang/OTP documentation.
 * Tags: `dev`
 
@@ -894,21 +898,21 @@ CPUs the maximum is 400.
 #### CPU load for 1 avg
 
 The average system load in the last minute, as described at
-[cpu_sup](http://www.erlang.org/doc/man/cpu_sup.html). 0 represents no load, 256 represents the
+[cpu_sup][]. 0 represents no load, 256 represents the
 load reported as 1.00 by `rup.`
 * Tags: `dev`, `op`
 
 #### CPU load for 5 avg
 
 The average system load in the last five minutes, as described at
-[cpu_sup](http://www.erlang.org/doc/man/cpu_sup.html). 0 represents no load, 256 represents the
+[cpu_sup][]. 0 represents no load, 256 represents the
 load reported as 1.00 by `rup`.
 * Tags: `dev`, `op`
 
 #### CPU load for 15 avg
 
 The average system load in the last 15 minutes, as described at
-[cpu_sup](http://www.erlang.org/doc/man/cpu_sup.html). 0 represents no load, 256 represents the
+[cpu_sup][]. 0 represents no load, 256 represents the
 load reported as 1.00 by `rup`.
 * Tags: `dev`, `op`
 
@@ -977,7 +981,7 @@ be greater than the wallclock time.
 #### Runtime since last call
 
 The run time of all process run time in milliseconds, since last call of
-`erlang:statistics/1`. For details, see [erlang:statistics/1](http://www.erlang.org/doc/man/erlang.html#statistics-1)
+`erlang:statistics/1`. For details, see [erlang:statistics/1][statistics]
 * Tags: `dev`
 
 #### Wallclock total
@@ -993,7 +997,7 @@ if checking with a clock on the wall).
 
 Time spent in terms of wall-clock time since last call of
 `erlang:statistics(wall_clock)`. For more details, see
-[erlang:statistics/1](http://www.erlang.org/doc/man/erlang.html#statistics-1).
+[erlang:statistics/1][statistics].
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#statistics-1 -->
@@ -1009,4 +1013,8 @@ Time elapsed in terms of wall-clock time since activation wall-clock in
 scheduler _x_.
 * Tags: `dev`
 
+[Configuration]: configuration.md
+[Notifications]: notifications.md
+[statistics]: http://www.erlang.org/doc/man/erlang.html#statistics-1
+[cpu_sup]: http://www.erlang.org/doc/man/cpu_sup.html
 

@@ -173,7 +173,7 @@ to `false`.
 {set, wo_rest, default_user_tags, all}.
 ```
 
-In order to change the [tags](./reference.html) that new users will be created with or
+In order to change the tags that new users will be created with or
 the tags that are used by the REST layer when the authentication is switched
 off, change the value of `default_user_tags` to either `all` or a list of tags
 represented as binary strings. If `all` is set, all information available in
@@ -255,9 +255,11 @@ the host name.
 This section describes which ports need to be open if there is a firewall
 between WombatOAM and the managed nodes.
 
-WombatOAM connects to the managed nodes via Erlang distribution, which needs the
-port used by EPMD (Erlang Port Mapper Daemon) to be open. EPMD uses TCP port
-4369 by default.
+WombatOAM connects to the managed nodes via
+[Erlang distribution](http://erlang.org/doc/apps/erts/erl_dist_protocol.html),
+a protocol designed to connect Erlang nodes with each other. Erlang distribution
+needs the port used by EPMD (Erlang Port Mapper Daemon) to be open. EPMD uses
+TCP port 4369 by default.
 
 You also need to make sure that the Erlang Distribution traffic can flow between
 WombatOAM and the managed nodes, for which there are two ways:
@@ -677,4 +679,3 @@ Deletes the given configuration entry.
     {send_notifications, all}
    ]}.
 ```
-

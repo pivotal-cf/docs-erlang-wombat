@@ -14,26 +14,35 @@ This topic describes how to install WombatOAM for PCF.
 
 1. Click **Add** next to the uploaded WombatOAM tile in the Ops Manager
    **Available Products** view to add it to your staging area.
-  ![WombatOAM for PCF tile](images/wombat-tile-added.png)
+  ![WombatOAM for PCF tile added](images/wombat-tile-added.png)
 
 1. Click on the newly added **WombatOAM** tile and review each configuration pane. 
+  ![WombatOAM for PCF tile not yet configured](images/wombat-tile-orange.png)
+
+1. Set network if necessary. If you make any changes to the configuration, click **Save**. 
   ![WombatOAM for PCF AZ and Networks](images/wombat-az-net-config.png)
 
-1. If you make any changes to the configuration, click **Save**. 
+1. Import the stemcell if necessary. The [appropriate stemcell can be downloaded from
+   bosh.cloudfoundry.org](http://bosh.cloudfoundry.org/stemcells/bosh-vsphere-esxi-ubuntu-trusty-go_agent).
+  ![WombatOAM for PCF Stemcell configuration](images/wombat-stemcell.png)
 
 1. Return to the Ops Manager Installation Dashboard and click **Apply Changes**
    to install WombatOAM tile.
+  ![WombatOAM for PCF tile install](images/wombat-apply-changes.png)
 
 ##<a id='logging_in'></a> Log in to the WombatOAM Dashboard
 
 1. From the Wombat OAM tile, select the **Credentials** tab and click on the
    **Links to credentials** link in the **App Credentials** row. 
+  ![WombatOAM Credentials link](images/wombat-credentials-1.png)
 
 1. Copy the password and remove the characters that are neither letters nor digits. This is the WombatOAM admin password.  
     <br>
-    _Example:_ If the **App Credentials** row shows `axZ3hc89SxQTq7-c3h-fy0JvFl2_2HcL`, your password is `axZ3hc89SxQTq7c3hfy0JvFl22HcL`.
+    _Example:_ If the **App Credentials** row shows `LuAVRWeZyNR-PM3BC7F2rz-bmfecYShw`, your password is `LuAVRWeZyNRPM3BC7F2rzbmfecYShw`.
+  ![WombatOAM Credentials](images/wombat-credentials-2.png)
 
 1. Navigate to `https://wombat.YOUR-SYSTEM-DOMAIN` and log in with the user name `admin` and the password from the previous step. 
+  ![WombatOAM Web Dashboard Login](images/wombat-login.png)
 
 ##<a id='setup'></a> Set Up WombatOAM to Monitor Erlang Nodes
 
@@ -46,18 +55,18 @@ To connect Erlang nodes with WombatOAM, you create a topology in the WombatOAM d
 ### <a id="collect-info"></a>Collect Node Information
 
 1. In Ops Manager, click the WombatOAM tile and select the **Status** tab.
+   Record the **IP** address of the **WombatOAM** machine.
   ![WombatOAM for PCF Status tab](images/wombat-status-tab.png)
 
-1. Record the **IP** address of the **WombatOAM** machine.
-
-1. Find the connection details of the RabbitMQ nodes. Connect to one of the
-   machines hosting a RabbitMQ server. 
+1. Find the connection details of the RabbitMQ nodes by connecting to one of the
+   machines hosting a RabbitMQ server (e.g. by using SSH) and collect the
+   followings:
 
 1. Collect the following from the RabbitMQ node:
 
    1. Erlang node name. This can be found in the
       `/var/vcap/store/rabbitmq/etc/rabbitmq/rabbitmq-env.conf` file. An example
-      node name is `rabbit@ee99dadbb7db7a2a11af9da424ba9920`.
+      node name is `rabbit@dddcb00baa7295e1b123f2e412b137e7`.
 
    1. Erlang cookie. This is stored in
       `/var/vcap/store/rabbitmq/.erlang.cookie`. The cookie is the same across
@@ -76,7 +85,7 @@ To connect Erlang nodes with WombatOAM, you create a topology in the WombatOAM d
 Add a node representing WombatOAM, and enable it to connect to your RabbitMQ nodes.
 
 1. From the WombatOAM web dashboard. Select **Topology** > **Add Node**. 
-  ![WombatOAM Add Node](images/wombat-dash-add-node.png)
+  ![Adding a Node to WombatOAM](images/wombat-dash-add-node.png)
 
 1. Add the WombatOAM server by completing these fields:
 
@@ -86,11 +95,12 @@ Add a node representing WombatOAM, and enable it to connect to your RabbitMQ nod
 
 1. Click **Add node**.<br>
    _Result_: The WombatOAM node appear on the left within seconds.
+  ![Node Added to WombatOAM](images/wombat-node-added.png)
 
 1. Select **Services** > **Execute** and open the WombatOAM node
-   family in the left panel. 
-
-1. Click the WombatOAM node name and select **Evaluate Erlang expression**.
+   family in the left panel. Click the WombatOAM node name and select **Evaluate
+   Erlang expression**.
+  ![Adding an Inet Rule to WombatOAM](images/wombat-eval-1.png)
 
 1. For all of the network rules you collected from the RabbitMQ node, evaluate the expression `wo_inet_rules:add_host({COMMA-DELIMITED-IP},["RULE-ID"]` using the IP address and ID for the rule.  
 <br>
@@ -100,6 +110,11 @@ _Example:_
     wo_inet_rules:add_host({10,65,179,56}, ["dddcb00baa7295e1b123f2e412b137e7"]).
     ```
   _Purpose:_ These rules tell WombatOAM that when asked to connect to a node specified by host name, it should connect to the given IP address rather than try to resolve the host name. WombatOAM stores these rules in a persistent database.
+  ![The Result of Adding an Inet Rule](images/wombat-eval-2.png)
+
+1. The inet rules can be viewed by evaluating the following Erlang expression:
+   `wo_inet_rules:get_rules().`
+  ![Checking the Inet Rules Stored in WombatOAM](images/wombat-get-rules.png)
 
 ### <a id="add-nodes"></a>Add Erlang Nodes
 
@@ -112,9 +127,19 @@ For each node you want to monitor with WombatOAM, do the following:
     1. **Node name**: Specify the Erlang node name that you collected.
     1. **Cookie**: specify the Erlang cookie that you collected.
     1. **Discover connected nodes**: To add a whole cluster in one step, select this box. To add only one node, leave it unselected.
+  ![Adding RabbitMQ nodes to WombatOAM](images/wombat-add-rabbit.png)
 
 1. Click **Add node**.
    <br>
    _Result_: The managed node appears on the left within seconds. 
+  ![RabbitMQ nodes added to WombatOAM](images/wombat-rabbit-added.png)
 
 Now WombatOAM collects metrics, notifications, and alarms from the Erlang nodes that you added. You can use the WombatOAM dashboard to inspect and perform operations on these nodes.
+
+An example of the Metrics tab:
+![WombatOAM Metrics](images/wombat-metrics.png)
+
+An example of the Alarms tab:
+![WombatOAM Alarms](images/wombat-alarms.png)
+
+**Note** If a tile is redeployed, stopped or started, BOSH can decide to change its IP address. This is problematic if either the IP address of a managed node changes or if the IP address of WombatOAM itself changes. If the IP address of a node changes, you need to update the inet rule by calling `wo_inet_rules:del_host(OldIP)` and `wo_inet_rules:add_host(NewIP, Host)`. If the IP address of the WombatOAM node changes, that is a bigger problem, because the data directory refers to the node name; so in that case, WombatOAM needs to be reinstalled.

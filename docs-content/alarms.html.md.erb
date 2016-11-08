@@ -139,7 +139,7 @@ This alarm is most likely to be raised when new modules that are dynamically
 created by an on-the-fly code generator are not deleted later.
 To recover from this situation, identify the modules that are no longer needed,
 and use `code:soft_purge/1` to erase them from the system.
-Pro tip: use WombatOAM's [Services](./index.html) to get rid of all unnecessary modules.
+Pro tip: use WombatOAM's Services to get rid of all unnecessary modules.
 
 ### Exported function count
 
@@ -167,7 +167,7 @@ statistics.
 To recover, identify the processes that consume the most memory.
 Perhaps, by reviewing their implementations, the memory consumption
 can be improved.
-Pro tip: Use WombatOAM's [ETOP like process listing](./index.html) to identify the
+Pro tip: Use WombatOAM's ETOP like process listing to identify the
 processes that consume the most memory.
 
 ### Open file count
@@ -185,8 +185,7 @@ any other OS process on the host may also be responsible.
 There is a built-in metric called `Open x ports` that shows the number of open
 ports belonging to specific types. By default, only ports with type TCP/UDP/SCTP
 are displayed, nonetheless, the metric can be configured to provide a much more
-detailed view. See the "[builtin_metrics plugin](./rabbitmq_plugin.html)" for
-more information.
+detailed view.
 
 This alarm is only raised on Linux and Solaris.
 
@@ -269,7 +268,7 @@ queues are often a symptom of a bottleneck and result in the degradation of
 throughput, with the system eventually running out of memory.
 
 If it occurs frequently, you should improve your code to remove the bottleneck.
-Pro tip: Use WombatOAM's [ETOP like process listing](./index.html) to identify the
+Pro tip: Use WombatOAM's ETOP like process listing to identify the
 processes with the largest message queue.
 
 ### CPU load
@@ -472,7 +471,7 @@ was aborted or a node with old configuration has joined the cluster.
 This alarm indicates a configuration management issue in the cluster.
 To recover, ensure that all the global configs share the same values on all
 nodes in a node family.
-Pro tip: use WombatOAM's [Configuration management](./configuration.html) feature.
+Pro tip: use WombatOAM's Configuration management feature.
 
 ### Different global configs
 
@@ -490,7 +489,7 @@ some nodes.
 This alarm indicates a configuration management issue in the cluster.
 To recover, ensure that all the global configs share the same values on all
 nodes in a node family.
-Pro tip: use WombatOAM's [Configuration management](./configuration.html) feature.
+Pro tip: use WombatOAM's Configuration management feature.
 
 ### Disk almost full
 
@@ -748,8 +747,7 @@ application. Each rule have the following fields:
   regular expression. Note that a dot in the pattern matches all characters,
   including those indicating newline.
 - **`match_tags`**: You can further filter notifications by tags. It can be the
-  `all` atom, or a list of tags in binary format. You can read more about it in
-  the [Tags](./reference.html) section.
+  `all` atom, or a list of tags in binary format.
 - **`alarm_properties`**: List of properties that the alarm will have.
   - **`alarm_id`**: Alarm id to be raised in atom format.
   - **`severity`**: Severity as an atom.
