@@ -141,3 +141,5 @@ An example of the Metrics tab:
 
 An example of the Alarms tab:
 ![WombatOAM Alarms](images/wombat-alarms.png)
+
+**Note** If a tile is redeployed, stopped or started, BOSH can decide to change its IP address. This is problematic if either the IP address of a managed node changes or if the IP address of WombatOAM itself changes. If the IP address of a node changes, you need to update the inet rule by calling `wo_inet_rules:del_host(OldIP)` and `wo_inet_rules:add_host(NewIP, Host)`. If the IP address of the WombatOAM node changes, that is a bigger problem, because the data directory refers to the node name; so in that case, WombatOAM needs to be reinstalled.
