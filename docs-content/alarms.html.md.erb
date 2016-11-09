@@ -234,7 +234,7 @@ These alarms are raised on Linux, OS X and Solaris.
 File descriptor alarms include both sockets and files, as they are sharing same
 (file descriptor or Erlang ports) resource.
 
-User alarm counts fd's opened by current user against ulimit -n.
+User alarm counts file descriptors opened by current user against ulimit -n.
 Node alarm counts ports open in current Erlang node against node limits.
 Ports are used for both files and sockets in Erlang.
 
@@ -407,8 +407,7 @@ To recover, ensure all nodes have the same module version in a node family.
 * Severity: warning.
 * Tags: `op`
 
-A module is not loaded in all nodes belonging to the node
-family.
+A module is not loaded in all nodes belonging to the node family.
 
 This alarm indicates a configuration management issue in the cluster.
 To recover, ensure the module is loaded in all nodes in a node family.
@@ -591,8 +590,7 @@ nodes if system resources are scarce.
 * Severity: indeterminate.
 * Tags: `dev`, `op`
 
-Any alarm reported to the SASL `alarm_handler` will be
-reported by WombatOAM.
+Any alarm reported to the SASL `alarm_handler` will be reported by WombatOAM.
 
 ### Elarm alarms
 
@@ -600,14 +598,13 @@ reported by WombatOAM.
 * Severity: indeterminate.
 * Tags: `dev`, `op`
 
-Any alarm reported to the [Elarm](https://github.com/esl/elarm) Alarm Manager will
-be reported by WombatOAM.
+Any alarm reported to the [Elarm](https://github.com/esl/elarm) Alarm Manager will be reported by WombatOAM.
 
 ##<a id='threshold_based_alarms'></a>Threshold based alarms
 
 In the majority of cases good system behaviour can be described with good metric
-values within a range. WombatOAM can raise alarms based on a given metric crossing
-a given threshold indicating the need for human intervention.
+values within a range. WombatOAM can raise alarms based on a given metric 
+crossing a given threshold indicating the need for human intervention.
 
 Notes:
 
@@ -733,9 +730,9 @@ following rule will raise an alarm if the value of the metric is more than 1000:
 
 ##<a id='notification_based_alarms'></a>Notification based alarms
 
-WombatOAM can be configured to monitor notifications. If a new notification matches
-the user defined criteria then WombatOAM will raise an alarm for the node that the
-log entry has been collected from.
+WombatOAM can be configured to monitor notifications. If a new notification 
+matches the user defined criteria, WombatOAM will raise an alarm for the 
+node that the log entry has been collected from.
 
 ### Configuring notification based alarms
 
@@ -783,17 +780,13 @@ The following example configuration contains one rule to raise an alarm with
 
 ##<a id='email_alarm_notifications'></a>Email alarm notifications
 
-WombatOAM can send notifications of alarms that are raised on the monitored nodes
-via email. You can be notified of all alarms, or specify the alarms for which
-you want to receive notifications.
+WombatOAM can send notifications of alarms that are raised on the monitored nodes via email. You can be notified of all alarms, or specify the alarms for which you want to receive notifications.
 
 ### Configuring email alarm notifications
 
 Alarm notification emails are configured in the `elarm` and `elarm_mailer`
 entries in the `sys.config` file. Overriding these in the `wombat.config` file
-is recommended. Edit the fields to match your system, and restart WombatOAM to load
-the new configuration. The following example configuration uses Gmail as a relay
-for outbound emails.
+is recommended. Edit the fields to match your system, and restart WombatOAM to load the new configuration. The following example configuration uses Gmail as a relay for outbound emails.
 
 ```erlang
 %% Elarm mailer config
