@@ -56,97 +56,116 @@ please refer to the Configuration reference in the
 #### Input I/O bytes
 
 The total number of bytes received through ports.
+
 * Tags: `dev`, `op`
 
 #### Output I/O bytes
 
 The total number of bytes output to ports.
+
 * Tags: `dev`, `op`
 
 #### TCP: Total bytes received
 
 The total number of bytes that have been received by TCP.
+
 * Tags: `dev`, `op`
 
 #### TCP: Packets received
 
 The number of TCP packets that have been received.
+
 * Tags: `dev`
 
 #### TCP: Average received packet size
 
 The average size of TCP packets that have been received.
+
 * Tags: `dev`
 
 #### TCP: Maximum received packet size
 
 The maximum size of TCP packets that have been received.
+
 * Tags: `dev`
 
 #### TCP: Total bytes sent
 
 The total number of bytes that have been sent by TCP.
+
 * Tags: `dev`, `op`
 
 #### TCP: Packets sent
 
 The number of TCP packets that have been sent.
+
 * Tags: `dev`, `op`
 
 #### TCP: Average sent packet size
 
 The average size of TCP packets that have been sent.
+
 * Tags: `dev`
 
 #### TCP: Maximum sent packet size
 
 The maximum size of TCP packets that have been sent.
+
 * Tags: `dev`
 
 #### UDP: Total bytes received
 
 The total number of bytes that have been received by UDP.
+
 * Tags: `dev`, `op`
 
 #### UDP: Packets received
 
 The number of UDP packets that have been received.
+
 * Tags: `dev`
 
 #### UDP: Average received packet size
 
 The average size of UDP packets that have been received.
+
 * Tags: `dev`
 
 #### UDP: Maximum received packet size
 
 The maximum size of UDP packets that have been received.
+
 * Tags: `dev`
 
 #### UDP: Total bytes sent
 
 The total number of bytes that have been sent by UDP.
+
 * Tags: `dev`, `op`
 
 #### UDP: Packets sent
 
 The number of UDP packets that have been sent.
+
 * Tags: `dev`, `op`
 
 #### UDP: Average sent packet size
 
 The average size of UDP packets that have been sent.
+
 * Tags: `dev`
 
 #### UDP: Maximum sent packet size
 
 The maximum size of UDP packets that have been sent.
+
 * Tags: `dev`
 
 #### Disk usage on _x_
 
 The result of the latest disk check for each partition. Reports the disk usage
 (e.g. the percentage of disk space occupied) on a mounted partition.
+
 * Tags: `op`
 
 <!-- REF: www.erlang.org/doc/man/disksup.html#get_disk_data-0 -->
@@ -157,17 +176,20 @@ The result of the latest disk check for each partition. Reports the disk usage
 
 The total amount of memory currently allocated, which is the same as the sum of
 memory size for `processes` and `system`.
+
 * Tags: `dev`, `op`
 
 #### Process memory
 
 The total amount of memory currently allocated by the Erlang processes.
+
 * Tags: `dev`, `op`
 
 #### Process memory used
 
 The total amount of memory currently used by the Erlang processes. This memory
 is part of the memory presented as `process` memory.
+
 * Tags: `dev`
 
 #### System memory
@@ -175,41 +197,48 @@ is part of the memory presented as `process` memory.
 The total amount of memory currently allocated by the emulator that is not
 directly related to any Erlang process. Memory presented as `processes` is not
 included in this memory.
+
 * Tags: `dev`, `op`
 
 #### Atom memory
 
 The total amount of memory currently allocated for atoms. This memory is part of
 the memory presented as `system` memory.
+
 * Tags: `dev`
 
 #### Atom memory used
 
 The total amount of memory currently used for atoms. This memory is part of the
 memory presented as `atom` memory.
+
 * Tags: `dev`
 
 #### Binary memory
 
 The total amount of memory currently allocated for binaries. This memory is part
 of the memory presented as `system` memory.
+
 * Tags: `dev`
 
 #### Code memory
 
 The total amount of memory currently allocated for Erlang code. This memory is
 part of the memory presented as `system` memory.
+
 * Tags: `dev`
 
 #### ETS memory
 
 The total amount of memory currently allocated for ETS tables. This memory is
 part of the memory presented as `system` memory.
+
 * Tags: `dev`
 
 #### System total memory
 
 The amount of memory available to the whole operating system.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/memsup.html#get_system_memory_data-0 -->
@@ -218,6 +247,7 @@ The amount of memory available to the whole operating system.
 
 The total amount of memory available to the Erlang emulator, allocated and free.
 May or may not be equal to the amount of memory configured in the system.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/memsup.html#get_system_memory_data-0 -->
@@ -225,6 +255,7 @@ May or may not be equal to the amount of memory configured in the system.
 #### Buffered memory
 
 The amount of memory the system uses for temporary storing raw disk blocks.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/memsup.html#get_system_memory_data-0 -->
@@ -232,6 +263,7 @@ The amount of memory the system uses for temporary storing raw disk blocks.
 #### Cached memory
 
 The amount of memory the system uses for cached files read from disk.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/memsup.html#get_system_memory_data-0 -->
@@ -239,6 +271,7 @@ The amount of memory the system uses for cached files read from disk.
 #### Free memory
 
 The amount of free memory available to the Erlang emulator for allocation.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/memsup.html#get_system_memory_data-0 -->
@@ -246,6 +279,7 @@ The amount of free memory available to the Erlang emulator for allocation.
 #### Free swap memory
 
 The amount of memory the system has available for disk swap.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/memsup.html#get_system_memory_data-0 -->
@@ -253,6 +287,7 @@ The amount of memory the system has available for disk swap.
 #### Swap memory used
 
 The amount of memory the system is using for disk swap.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/memsup.html#get_system_memory_data-0 -->
@@ -260,11 +295,13 @@ The amount of memory the system is using for disk swap.
 #### Atoms
 
 The total number of atoms in the system.
+
 * Tags: `dev`
 
 #### DETS tables
 
 The number of open DETS tables on the selected node.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/dets.html#all-0 -->
@@ -272,6 +309,7 @@ The number of open DETS tables on the selected node.
 #### ETS tables
 
 The number of ETS tables at the selected node.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/ets.html#all-0 -->
@@ -281,17 +319,20 @@ The number of ETS tables at the selected node.
 The total amount of memory allocated in low memory areas that are restricted to
 less than 4GB even though the system may have more physical memory. The metric
 is available only on 64-bit halfword emulator.
+
 * Tags: `dev`
 
 #### Maximum memory
 
 The maximum total amount of memory allocated since the emulator was started. The
 metric is available only when the emulator is run with instrumentation.
+
 * Tags: `dev`
 
 #### Allocated atom\_table area
 
 The amount of allocated memory for this area in bytes.
+
 * Tags: `dev`
 
 <!-- erlang:system_info(allocated_areas). -->
@@ -301,81 +342,97 @@ The amount of allocated memory for this area in bytes.
 #### Allocated bif\_timer area
 
 Memory allocated for timers in bytes.
+
 * Tags: `dev`
 
 #### Allocated bits\_bufs\_size area
 
 The amount of allocated memory for this area in bytes.
+
 * Tags: `dev`
 
 #### Allocated dist\_table area
 
 Memory allocated for the distribution table in bytes.
+
 * Tags: `dev`
 
 #### Allocated ets\_misc area
 
 The amount of allocated memory for this area in bytes.
+
 * Tags: `dev`
 
 #### Allocated export\_list area
 
 The amount of allocated memory for this area in bytes.
+
 * Tags: `dev`
 
 #### Allocated export\_table area
 
 Memory allocated for the export table in bytes.
+
 * Tags: `dev`
 
 #### Allocated fun\_table area
 
 Memory allocated for the function table in bytes.
+
 * Tags: `dev`
 
 #### Allocated link\_lh area
 
 The amount of allocated memory for this area in bytes.
+
 * Tags: `dev`
 
 #### Allocated loaded\_code area
 
 Memory allocated for all the loaded code in bytes.
+
 * Tags: `dev`
 
 #### Allocated module\_refs area
 
 The amount of allocated memory for this area in bytes.
+
 * Tags: `dev`
 
 #### Allocated module\_table area
 
 The amount of allocated memory for this area in bytes.
+
 * Tags: `dev`
 
 #### Allocated node\_table area
 
 Memory allocated for the table of nodes in bytes.
+
 * Tags: `dev`
 
 #### Allocated process\_table area
 
 Memory allocated for the process table in bytes.
+
 * Tags: `dev`
 
 #### Allocated register\_table area
 
 The amount of allocated memory for this area in bytes.
+
 * Tags: `dev`
 
 #### Allocated static area
 
 The amount of allocated memory for this area in bytes.
+
 * Tags: `dev`
 
 #### Allocated sys\_misc area
 
 The amount of allocated memory for this area in bytes.
+
 * Tags: `dev`
 
 ###<a id='mnesia_system_metrics'></a>Mnesia System metrics
@@ -476,6 +533,7 @@ All currently active local transactions.
 The number of nodes that are known to the selected node;
 this includes not only visible nodes, but also hidden nodes and
 previously known nodes, etc.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/reference_manual/distributed.html#id85718 -->
@@ -483,23 +541,27 @@ previously known nodes, etc.
 #### Connected nodes
 
 The number of nodes that are connected to the selected node.
+
 * Tags: `dev`, `op`
 
 #### Visible nodes
 
 The number of nodes that are connected to the selected node through normal
 connections.
+
 * Tags: `dev`
 
 #### Hidden nodes
 
 The number of nodes that are connected to the selected node through hidden
 connections.
+
 * Tags: `dev`
 
 #### Traced nodes
 
 The number of nodes traced from the current node by the Erlang `dbg` facility.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/dbg.html#ln-0 -->
@@ -508,12 +570,14 @@ The number of nodes traced from the current node by the Erlang `dbg` facility.
 
 The number of loaded Erlang modules (current and/or old code), including
 preloaded modules.
+
 * Tags: `dev`
 
 #### Old modules
 
 The number of modules that have old code. For more details, see "Current and Old
 Code" on the following page: www.erlang.org/doc/man/code.html
+
 * Tags: `dev`
 
 <!-- COMMENT: see www.erlang.org/doc/man/code.html -->
@@ -522,6 +586,7 @@ Code" on the following page: www.erlang.org/doc/man/code.html
 
 The number of module name clashes. The function searches the entire code space
 for module names with identical names.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/code.html#clash-0 -->
@@ -530,6 +595,7 @@ for module names with identical names.
 
 The number of applications that have been loaded into the application
 controller. This includes any included applications.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/apps/kernel/application.html#loaded_applications-0,
@@ -539,6 +605,7 @@ www.erlang.org/doc/apps/kernel/application.html#load-1 -->
 
 The number of processes started by the **application controller** process, which
 starts all other applications.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/design_principles/applications.html#id74215,
@@ -547,6 +614,7 @@ starts all other applications.
 #### Running applications
 
 The number of applications that are currently running.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/apps/kernel/application.html#which_applications-0 -->
@@ -556,6 +624,7 @@ The number of applications that are currently running.
 #### Open ports
 
 The number of ports currently existing on the local node.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#ports-0 -->
@@ -571,6 +640,7 @@ at the same time.)  It might indicate a bottleneck if such a driver has many
 instances. (See [erlang:port_info/2][PortInfoLocking] and the
 `ERL_DRV_FLAG_USE_PORT_LOCKING` [driver flag][DriverFlagLocking].) This metric
 is always zero on VMs with SMP support disabled.
+
 * Tags: `dev`
 
 [PortInfoLocking]: http://erlang.org/doc/man/erlang.html#port_info-2
@@ -580,33 +650,39 @@ is always zero on VMs with SMP support disabled.
 
 The total amount of data, in bytes, queued by all ports using the ERTS driver
 queue implementation.
+
 * Tags: `dev`
 
 #### Alive ports total output in bytes
 
 The total number of bytes written to by all ports from Erlang processes using
 either `port_command/2`, `port_command/3`, or `Port ! {Owner, {command, Data}}`.
+
 * Tags: `dev`
 
 #### Open TCP sockets
 
 The number of TCP sockets that are connected.
+
 * Tags: `dev`, `op`
 
 #### Open UDP sockets
 
 The number of UDP sockets that are connected.
+
 * Tags: `dev`, `op`
 
 #### Open SCTP sockets
 
 The number of SCTP sockets that are connected.
+
 * Tags: `dev`, `op`
 
 #### Open _x_ ports
 
 The number of open ports belonging to a specific type. This type is obtained
 from `erlang:port_info/1` using the `name` key of the proplist.
+
 * Tags: `dev`, `op`
 
 By default, only ports with type TCP/UDP/SCTP are displayed. The
@@ -622,6 +698,7 @@ ports, including ports opened by a running application.
 The number of "Long GC" triggers from the system monitor in the last period
 (minute or second). A "Long GC" trigger means that a garbage collection in the
 system took longer than expected.
+
 * Tags: `dev`
 
 #### Long schedule
@@ -630,6 +707,7 @@ The number of "Long schedule" triggers from the system monitor in the last
 period (minute or second). A "Long schedule" trigger means that a process or
 port in the system has been running uninterrupted for a longer time than
 expected.
+
 * Tags: `dev`
 
 #### Large heap
@@ -637,6 +715,7 @@ expected.
 The number of "Large heap" triggers from the system monitor in the last period
 (minute or second). A "Large heap" trigger means that a garbage collection in
 the system resulted in the size of a heap being unusually large.
+
 * Tags: `dev`
 
 #### Busy port
@@ -644,6 +723,7 @@ the system resulted in the size of a heap being unusually large.
 The number of "Busy port" triggers from the system monitor in the last period
 (minute or second). A "Busy port" trigger means that a process in the system was
 suspended because it was sending to a busy port.
+
 * Tags: `dev`, `op`
 
 #### Busy dist port
@@ -652,6 +732,7 @@ The number of "Busy dist port" triggers from the system monitor in the last
 period (minute or second). A "Busy dist port" trigger means that a process in
 the system was suspended because it was sending to a process on a remote node
 whose inter-node communication was handled by a busy port.
+
 * Tags: `dev`, `op`
 
 ###<a id='processes'></a>Processes
@@ -659,6 +740,7 @@ whose inter-node communication was handled by a busy port.
 #### Processes
 
 The number of processes currently existing at the selected node.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#system_info-1 -->
@@ -667,6 +749,7 @@ The number of processes currently existing at the selected node.
 
 The maximum number of processes that can existing simultaneously on the selected
 node.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#system_info-1 -->
@@ -674,6 +757,7 @@ node.
 #### Registered processes
 
 The number of process names that have been registered.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#registered-0 -->
@@ -685,6 +769,7 @@ function returns the number of LWP's (aka threads) that are alive in the system.
 That is something similar to what you get when you run `ps -eLF`. It is a
 rudimentary way of measuring the system load that may be of interest in some
 cases.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/documentation/doc-5.1/lib/os_mon-1.5.0/doc/html/cpu_sup.html -->
@@ -692,11 +777,13 @@ cases.
 #### Processes traced
 
 The total number of processes traced by the Erlang's tracing mechanism.
+
 * Tags: `dev`
 
 #### Sum process dictionary size
 
 The total size of the process dictionaries of all processes.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#process_info-2 -->
@@ -704,6 +791,7 @@ The total size of the process dictionaries of all processes.
 #### Sum message queue length
 
 The total number of messages currently in the message queue of all processes.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#process_info-2 -->
@@ -712,12 +800,14 @@ The total number of messages currently in the message queue of all processes.
 
 The number of messages currently in the message queue of the
 Erlang error logger.
+
 * Tags: `dev`, `op`
 
 #### Memory size of all processes
 
 The total size of all processes. This includes call stack,
 heap and internal structures.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#process_info-2 -->
@@ -725,6 +815,7 @@ heap and internal structures.
 #### Number of process groups
 
 The total number of known process groups.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/pg2.html#which_groups-0 -->
@@ -733,39 +824,46 @@ The total number of known process groups.
 
 Sum of history length (the number of commands evaluated by a shell process)
 of all shell processes.
+
 * Tags: `dev`, `op`
 
 #### Shell process size
 
 Sum of the size all shell processes. This includes call stack, heap, and
 internal structures.
+
 * Tags: `dev`
 
 #### Processes in running state
 
 The number of processes where the status of the process is `running`.
+
 * Tags: `dev`
 
 #### Processes in runnable state
 
 The number of processes where the status of the process is `runnable`
 (ready to run, but another process is running).
+
 * Tags: `dev`
 
 #### Processes in exiting state
 
 The number of processes where the status of the process is `exiting`.
+
 * Tags: `dev`
 
 #### Processes in GC state
 
 The number of processes where the status of the process is `garbage_collecting`.
+
 * Tags: `dev`
 
 #### Processes in waiting state
 
 The number of processes where the status of the process is `waiting`
 (for a message).
+
 * Tags: `dev`
 
 #### Processes in suspended state
@@ -773,12 +871,14 @@ The number of processes where the status of the process is `waiting`
 The number of processes where the status of the process is `suspended`
 (suspended on a "busy" port or by the `erlang:suspend_process/[1,2]`
 built-in function).
+
 * Tags: `dev`
 
 #### Processes with max priority
 
 The number of processes where the current priority level for the process
 is `max`.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#process_info-2 -->
@@ -787,6 +887,7 @@ is `max`.
 
 The number of processes where the current priority level for the process
 is `high`.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#process_info-2 -->
@@ -795,6 +896,7 @@ is `high`.
 
 The number of processes where the current priority level for the process
 is `normal`.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#process_info-2 -->
@@ -803,6 +905,7 @@ is `normal`.
 
 The number of processes where the current priority level for the process
 is `low`.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#process_info-2 -->
@@ -812,16 +915,19 @@ is `low`.
 Every process is a member of some process group and all groups have a group
 leader process. Every application has a group leader. For each application, this
 metric shows the number of processes associated to the application group leader.
+
 * Tags: `dev`
 
 #### Orphan processes
 
 The number of processes that do not belong to any group leader.
+
 * Tags: `dev`
 
 #### Unknown processes
 
 The number of processes that belong to a non-application group leader process.
+
 * Tags: `dev`
 
 ###<a id='runtime'></a>Runtime
@@ -829,17 +935,20 @@ The number of processes that belong to a non-application group leader process.
 #### Context switch count
 
 The total number of context switches since the system started.
+
 * Tags: `dev`
 
 #### Scheduler run queue size
 
 The total length of the run queues, that is, the number of processes that are
 ready to run on all available run queues.
+
 * Tags: `dev`, `op`
 
 #### Reduction count for all processes
 
 The total number of reductions executed by all processes.
+
 * Tags: `dev`
 
 #### Reductions since last call
@@ -847,12 +956,14 @@ The total number of reductions executed by all processes.
 The number of reductions that happened since the last call of
 `erlang:statistics/1`. For more details, see [statistics][statistics] on the
 `erlang` module's manual page in the Erlang/OTP documentation.
+
 * Tags: `dev`
 
 #### Reductions total
 
 The total number of reductions performed by processes. This is an approximate
 measure of how much CPU time they have used.
+
 * Tags: `dev`
 
 <!-- REF: "Erlang and OTP in Action" (Logan, Merritt, Carlsson) -->
@@ -860,39 +971,46 @@ measure of how much CPU time they have used.
 #### Garbage collections
 
 The total number of garbage collections since the system started.
+
 * Tags: `dev`
 
 #### Minor garbage collections
 
 The total of minor garbage collections that have happened so far for every
 process in the system.
+
 * Tags: `dev`
 
 #### Bytes reclaimed by GC
 
 The total number of bytes reclaimed through garbage collection.
+
 * Tags: `dev`
 
 #### Average fullsweep after
 
 The average value of the `fullsweep_after` parameter for all processes. Relates
 to garbage collection.
+
 * Tags: `dev`
 
 #### Average min binary vheap size
 
 The average of minimum binary virtual heap sizes (in words) for all processes.
+
 * Tags: `dev`
 
 #### Average min heap size
 
 The average of minimum heap sizes (in words) for all processes.
+
 * Tags: `dev`
 
 #### CPU utilization total
 
 The sum of CPU utilization in percentages on all the cores. In case of having 4
 CPUs the maximum is 400.
+
 * Tags: `dev`, `op`
 
 #### CPU load for 1 avg
@@ -900,6 +1018,7 @@ CPUs the maximum is 400.
 The average system load in the last minute, as described at
 [cpu_sup][]. 0 represents no load, 256 represents the
 load reported as 1.00 by `rup.`
+
 * Tags: `dev`, `op`
 
 #### CPU load for 5 avg
@@ -907,6 +1026,7 @@ load reported as 1.00 by `rup.`
 The average system load in the last five minutes, as described at
 [cpu_sup][]. 0 represents no load, 256 represents the
 load reported as 1.00 by `rup`.
+
 * Tags: `dev`, `op`
 
 #### CPU load for 15 avg
@@ -914,6 +1034,7 @@ load reported as 1.00 by `rup`.
 The average system load in the last 15 minutes, as described at
 [cpu_sup][]. 0 represents no load, 256 represents the
 load reported as 1.00 by `rup`.
+
 * Tags: `dev`, `op`
 
 #### CPU utilization - kernel on core _x_
@@ -922,6 +1043,7 @@ CPU utilization (the percentage share of the CPU cycles spent in this processor
 state) for executing code in kernel mode. Each CPU is specified separately, if
 this information can be retrieved from the operating system. Available for
 Solaris and Linux only.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/cpu_sup.html#util-1 -->
@@ -932,6 +1054,7 @@ CPU utilization (the percentage share of the CPU cycles spent in this processor
 state) for executing code in user mode. Each CPU is specified separately, if
 this information can be retrieved from the operating system. Available for
 Solaris and Linux only.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/cpu_sup.html#util-1 -->
@@ -942,6 +1065,7 @@ CPU utilization (the percentage share of the CPU cycles spent in this processor
 state) for executing code in low priority (nice) user mode. Each CPU is
 specified separately, if this information can be retrieved from the operating
 system. Available for Linux only.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/cpu_sup.html#util-1 -->
@@ -951,6 +1075,7 @@ system. Available for Linux only.
 The percentage share of the CPU cycles spent in the idle state. Each CPU is
 specified separately, if this information can be retrieved from the operating
 system. Available for Solaris and Linux only.
+
 * Tags: `dev`, `op`
 
 <!-- REF: www.erlang.org/doc/man/cpu_sup.html#util-1 -->
@@ -962,18 +1087,21 @@ system. Available for Solaris and Linux only.
 The number of all timers (one-shot and interval timers) in the table holding
 timing requests and timer objects; this is an ETS table maintained by Erlang's
 timer server.
+
 * Tags: `dev`
 
 #### Interval timers
 
 The number of internal timers in the timer interval table, an ETS table
 maintained by Erlang's timer server.
+
 * Tags: `dev`
 
 #### Runtime total
 
 The sum of the runtime for all threads in the Erlang run-time system. This may
 be greater than the wallclock time.
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#statistics-1 -->
@@ -982,12 +1110,14 @@ be greater than the wallclock time.
 
 The run time of all process run time in milliseconds, since last call of
 `erlang:statistics/1`. For details, see [erlang:statistics/1][statistics]
+
 * Tags: `dev`
 
 #### Wallclock total
 
 The time that has elapsed since the program started, measured in real time (as
 if checking with a clock on the wall).
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/pipermail/erlang-questions/2009-May/043698.html,
@@ -998,6 +1128,7 @@ if checking with a clock on the wall).
 Time spent in terms of wall-clock time since last call of
 `erlang:statistics(wall_clock)`. For more details, see
 [erlang:statistics/1][statistics].
+
 * Tags: `dev`
 
 <!-- REF: www.erlang.org/doc/man/erlang.html#statistics-1 -->
@@ -1005,12 +1136,14 @@ Time spent in terms of wall-clock time since last call of
 #### Scheduler _x_ active wall time
 
 Active time of scheduler _x_ in terms of wall-clock time.
+
 * Tags: `dev`
 
 #### Scheduler _x_ total wall time
 
 Time elapsed in terms of wall-clock time since activation wall-clock in
 scheduler _x_.
+
 * Tags: `dev`
 
 [Configuration]: configuration.html
